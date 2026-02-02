@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import LandingJuniorImg from "../assets/landing-junior.png";
+import LandingProfessionalImg from "../assets/landing-professional.png";
 
 const LandingPage = () => {
   return (
@@ -25,16 +27,14 @@ const LandingPage = () => {
           {/* Professionals Card */}
           <div className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col">
             <div className="h-64 bg-gray-200 relative overflow-hidden group">
-              {/* No changes needed
-              This is just a placeholder to ensure I didn't miss API calls in LandingPage or others.*/}
-              {/* Placeholder for Professionals Image */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              <div className="absolute top-0 right-0 p-8 w-full h-full flex items-center justify-center bg-gray-100">
-                {/* Decorative abstract office shapes */}
-                <div className="w-32 h-32 bg-gray-300 rounded-lg transform rotate-12 opacity-50"></div>
-                <div className="w-48 h-32 bg-gray-200 rounded-lg -ml-16 shadow-lg z-10"></div>
-              </div>
-              <div className="absolute bottom-6 left-6 w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shadow-lg z-20">
+              <img
+                src={LandingProfessionalImg}
+                alt="Professional Learning"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+              <div className="absolute bottom-6 left-6 w-16 h-16 bg-blue-100/90 backdrop-blur-sm rounded-2xl flex items-center justify-center text-blue-600 shadow-lg z-20">
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -113,23 +113,14 @@ const LandingPage = () => {
           {/* Juniors Card */}
           <div className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col">
             <div className="h-64 bg-emerald-50 relative overflow-hidden group">
-              {/* Placeholder for Juniors Image */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              <div className="absolute top-0 right-0 p-8 w-full h-full flex items-center justify-center bg-orange-50">
-                {/* Decorative abstract school shapes */}
-                <div className="w-20 h-20 bg-orange-200 rounded-full opacity-60 top-10 right-10 absolute"></div>
-                <div className="w-40 h-28 bg-emerald-100 rounded-xl shadow-md z-10 flex items-center justify-center text-emerald-300">
-                  <div
-                    className="w-full h-full opacity-30 bg-repeat space-x-2 space-y-2 p-2"
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle, currentColor 1px, transparent 1px)",
-                      backgroundSize: "10px 10px",
-                    }}
-                  ></div>
-                </div>
-              </div>
-              <div className="absolute bottom-6 left-6 w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg z-20">
+              <img
+                src={LandingJuniorImg}
+                alt="Junior Learning"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+
+              <div className="absolute bottom-6 left-6 w-16 h-16 bg-emerald-100/90 backdrop-blur-sm rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg z-20">
                 <svg
                   className="w-9 h-9"
                   fill="currentColor"
@@ -171,7 +162,7 @@ const LandingPage = () => {
                       </span>
                       {item}
                     </li>
-                  )
+                  ),
                 )}
               </ul>
 
@@ -203,18 +194,18 @@ const LandingPage = () => {
       <footer className="bg-white py-10 mt-10 border-t border-gray-100">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center gap-8 mb-6 text-sm font-semibold text-gray-600">
-            <a href="#" className="hover:text-blue-600">
+            <Link to="/about" className="hover:text-blue-600">
               About Us
-            </a>
-            <a href="#" className="hover:text-blue-600">
+            </Link>
+            <Link to="/contact" className="hover:text-blue-600">
               Contact
-            </a>
-            <a href="#" className="hover:text-blue-600">
+            </Link>
+            <Link to="/privacy" className="hover:text-blue-600">
               Privacy Policy
-            </a>
-            <a href="#" className="hover:text-blue-600">
+            </Link>
+            <Link to="/terms" className="hover:text-blue-600">
               Terms of Service
-            </a>
+            </Link>
           </div>
           <p className="text-gray-400 text-sm">
             © 2026 AcadLearn. All rights reserved.

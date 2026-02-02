@@ -1,27 +1,53 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ProHeroImg from "../assets/pro-hero.png";
+import Pro1 from "../assets/pro1.png";
+import Pro2 from "../assets/pro2.png";
+import Pro3 from "../assets/pro3.png";
+import Pro4 from "../assets/pro4.png";
+import Pro5 from "../assets/pro5.png";
+import Pro6 from "../assets/pro6.png";
+import Logo from "../assets/logo.jpeg";
 
 const ProfessionalHome = () => {
+  const [activeCategory, setActiveCategory] = useState("All Courses");
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" || e.type === "click") {
+      console.log("Searching...");
+    }
+  };
+
+  const handleNavClick = (sectionId, e) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleEnroll = (title) => {
+    navigate(`/checkout/${title.toLowerCase().replace(/\s+/g, "-")}`);
+  };
+
+  const handleCategoryClick = (cat) => {
+    setActiveCategory(cat);
+    console.log("Filter by:", cat);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-slate-800">
       {/* Header */}
       <nav className="bg-white border-b border-gray-100 py-4 sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                ></path>
-              </svg>
+            <div className="w-8 h-8 rounded overflow-hidden flex items-center justify-center">
+              <img
+                src={Logo}
+                alt="AcadLearn Pro Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-bold tracking-tight">
               AcadLearn <span className="text-blue-600">Pro</span>
@@ -29,13 +55,25 @@ const ProfessionalHome = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a href="#" className="hover:text-blue-600">
+            <a
+              href="#"
+              onClick={(e) => handleNavClick("courses-section", e)}
+              className="hover:text-blue-600"
+            >
               Browse Courses
             </a>
-            <a href="#" className="hover:text-blue-600">
+            <a
+              href="#"
+              onClick={(e) => handleNavClick("pricing", e)}
+              className="hover:text-blue-600"
+            >
               Pricing
             </a>
-            <a href="#" className="hover:text-blue-600">
+            <a
+              href="#"
+              onClick={(e) => handleNavClick("teams", e)}
+              className="hover:text-blue-600"
+            >
               For Teams
             </a>
           </div>
@@ -59,9 +97,18 @@ const ProfessionalHome = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <div className="bg-[#1e293b] rounded-3xl p-10 md:p-20 text-center relative overflow-hidden mb-12">
-          {/* Geometric Background Overlay */}
-          <div className="absolute inset-0 opacity-10">
+        <div className="bg-[#1e293b] rounded-3xl p-10 md:p-20 text-center relative overflow-hidden mb-12 group">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src={ProHeroImg}
+              alt="Professional Background"
+              className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b]/80 to-[#1e293b]/90"></div>
+          </div>
+
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
             <svg
               className="w-full h-full"
               viewBox="0 0 100 100"
@@ -99,9 +146,13 @@ const ProfessionalHome = () => {
                   type="text"
                   placeholder="What do you want to learn today?"
                   className="w-full outline-none text-gray-700"
+                  onKeyDown={handleSearch}
                 />
               </div>
-              <button className="px-8 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors">
+              <button
+                onClick={handleSearch}
+                className="px-8 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
+              >
                 Search
               </button>
             </div>
@@ -158,9 +209,16 @@ const ProfessionalHome = () => {
         {/* Categories */}
         <div className="mb-12">
           <div className="flex justify-between items-end mb-6">
-            <h2 className="text-2xl font-bold">Explore Categories</h2>
+            <h2 id="courses-section" className="text-2xl font-bold">
+              Explore Categories
+            </h2>
             <a
               href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                // Clear filter logic would go here
+                setActiveCategory("All Courses");
+              }}
               className="text-blue-600 text-sm font-semibold hover:underline flex items-center"
             >
               View All{" "}
@@ -190,8 +248,9 @@ const ProfessionalHome = () => {
             ].map((cat, i) => (
               <button
                 key={i}
+                onClick={() => handleCategoryClick(cat)}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                  i === 0
+                  activeCategory === cat
                     ? "bg-slate-900 text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
@@ -214,6 +273,10 @@ const ProfessionalHome = () => {
               rating="4.8"
               tags={["Python", "Pandas", "Visualization"]}
               imageColor="bg-sky-700"
+              image={Pro1}
+              onEnroll={() =>
+                handleEnroll("Advanced Data Analytics with Python")
+              }
             />
             <ProCourseCard
               category="Product Mgmt"
@@ -223,6 +286,7 @@ const ProfessionalHome = () => {
               rating="4.9"
               tags={["Strategy", "Agile", "Leadership"]}
               imageColor="bg-indigo-800"
+              image={Pro2}
             />
             <ProCourseCard
               category="Engineering"
@@ -232,6 +296,7 @@ const ProfessionalHome = () => {
               rating="4.7"
               tags={["React", "Node.js", "MongoDB"]}
               imageColor="bg-slate-800"
+              image={Pro3}
             />
             <ProCourseCard
               category="Marketing"
@@ -241,6 +306,7 @@ const ProfessionalHome = () => {
               rating="4.6"
               tags={["SEO", "Ads", "Analytics"]}
               imageColor="bg-emerald-700"
+              image={Pro4}
             />
             <ProCourseCard
               category="Leadership"
@@ -250,6 +316,7 @@ const ProfessionalHome = () => {
               rating="4.9"
               tags={["Mgmt", "Soft Skills", "Public Speaking"]}
               imageColor="bg-neutral-800"
+              image={Pro5}
             />
             <ProCourseCard
               category="Design"
@@ -259,10 +326,88 @@ const ProfessionalHome = () => {
               rating="4.7"
               tags={["Figma", "Prototyping", "User Research"]}
               imageColor="bg-pink-800"
+              image={Pro6}
             />
           </div>
         </div>
       </main>
+
+      {/* New Sections for Real Navigation */}
+      <section id="pricing" className="py-20 bg-white border-t border-gray-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-12">
+            Simple, Transparent Pricing
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
+              <h3 className="font-bold text-xl mb-4">Basic</h3>
+              <div className="text-4xl font-bold mb-6">
+                $29
+                <span className="text-sm text-gray-500 font-normal">/mo</span>
+              </div>
+              <ul className="text-left space-y-3 mb-8 text-gray-600">
+                <li>• Access to 100+ courses</li>
+                <li>• Community support</li>
+                <li>• Mobile app access</li>
+              </ul>
+              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
+                Start Free Trial
+              </button>
+            </div>
+            <div className="border border-blue-600 bg-blue-50 p-8 rounded-2xl hover:shadow-lg transition-all relative">
+              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                MOST POPULAR
+              </div>
+              <h3 className="font-bold text-xl mb-4 text-blue-900">Pro</h3>
+              <div className="text-4xl font-bold mb-6 text-blue-900">
+                $59
+                <span className="text-sm text-blue-700 font-normal">/mo</span>
+              </div>
+              <ul className="text-left space-y-3 mb-8 text-blue-800">
+                <li>• Access to ALL courses</li>
+                <li>• Certificate of completion</li>
+                <li>• 1-on-1 Mentorship</li>
+                <li>• Offline downloads</li>
+              </ul>
+              <button className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+                Get Started
+              </button>
+            </div>
+            <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
+              <h3 className="font-bold text-xl mb-4">Team</h3>
+              <div className="text-4xl font-bold mb-6">
+                $99
+                <span className="text-sm text-gray-500 font-normal">/user</span>
+              </div>
+              <ul className="text-left space-y-3 mb-8 text-gray-600">
+                <li>• Admin dashboard</li>
+                <li>• Team analytics</li>
+                <li>• SSO Integration</li>
+                <li>• Dedicated account manager</li>
+              </ul>
+              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
+                Contact Sales
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="teams" className="py-20 bg-slate-900 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-6">Upskill Your Entire Team</h2>
+          <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">
+            Join 500+ companies that use AcadLearn Pro to train their workforce.
+          </p>
+          <div className="flex flex-wrap justify-center gap-12 font-bold text-2xl text-slate-600 opacity-50">
+            <span>ACME Corp</span>
+            <span>Globex</span>
+            <span>Soylent Corp</span>
+            <span>Initech</span>
+            <span>Umbrella</span>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-100 py-12 border-t border-gray-200 text-sm">
@@ -270,20 +415,12 @@ const ProfessionalHome = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                    ></path>
-                  </svg>
+                <div className="w-6 h-6 rounded overflow-hidden flex items-center justify-center">
+                  <img
+                    src={Logo}
+                    alt="AcadLearn Pro Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="font-bold text-slate-800">AcadLearn Pro</span>
               </div>
@@ -298,9 +435,9 @@ const ProfessionalHome = () => {
               </h4>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <Link to="/about" className="hover:text-blue-600">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="hover:text-blue-600">
@@ -330,9 +467,9 @@ const ProfessionalHome = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <Link to="/contact" className="hover:text-blue-600">
                     Contact
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -342,19 +479,19 @@ const ProfessionalHome = () => {
               </h4>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <Link to="/terms" className="hover:text-blue-600">
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <Link to="/privacy" className="hover:text-blue-600">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <Link to="/privacy" className="hover:text-blue-600">
                     Cookie Policy
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -398,12 +535,19 @@ const ProCourseCard = ({
   rating,
   tags,
   imageColor,
+  image,
+  onEnroll,
 }) => (
   <div className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-    <div className={`h-48 ${imageColor} relative`}>
-      {/* Placeholder Course Image */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30"></div>
-      <div className="absolute top-4 left-4 bg-white text-gray-800 text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase">
+    <div className={`h-48 ${imageColor} relative overflow-hidden group`}>
+      {/* Course Image */}
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60"></div>
+      <div className="absolute top-4 left-4 bg-white text-gray-800 text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase z-10">
         {category}
       </div>
     </div>
@@ -439,7 +583,10 @@ const ProCourseCard = ({
           <span className="text-xs text-gray-400 block">Price</span>
           <span className="text-lg font-bold text-gray-900">{price}</span>
         </div>
-        <button className="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700 transition-colors">
+        <button
+          onClick={onEnroll || (() => {})}
+          className="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700 transition-colors"
+        >
           Enroll Now
         </button>
       </div>

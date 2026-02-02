@@ -22,16 +22,19 @@ const Signup = () => {
       return;
     }
     try {
-      // Using relative path as configured in vite proxy
-      const response = await fetch("/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      // Using hosted backend
+      const response = await fetch(
+        "https://acad-learn2-backend.vercel.app/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem("userInfo", JSON.stringify(data));
