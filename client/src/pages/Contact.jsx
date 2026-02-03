@@ -70,12 +70,12 @@ const Contact = () => {
                 <span className="font-semibold">Phone:</span>{" "}
                 <span>+91 78385 38283, +91 88966 63644</span>
               </div>
-              <p className="text-sm text-gray-600 mt-4">
+              {/* <p className="text-sm text-gray-600 mt-4">
                 Or you can directly call:{" "}
                 <span className="font-semibold">
                   +917838538283, +918896663644
                 </span>
-              </p>
+              </p> */}
             </div>
           </div>
 

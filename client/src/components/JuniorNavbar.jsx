@@ -80,12 +80,12 @@ const JuniorNavbar = () => {
           >
             My Classes
           </Link> */}
-          <Link
+          {/* <Link
             to="/junior/trophies"
             className="text-gray-700 hover:text-orange-500 transition-colors"
           >
             Trophies
-          </Link>
+          </Link> */}
         </div>
 
         {/* Right: Auth + primary CTA for Junior */}
@@ -133,9 +133,9 @@ const JuniorNavbar = () => {
               Contact Us
             </Link>
 
-            <Link to="/junior/trophies" onClick={() => setOpen(false)}>
+            {/* <Link to="/junior/trophies" onClick={() => setOpen(false)}>
               Trophies
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}
