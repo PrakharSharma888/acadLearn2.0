@@ -5,7 +5,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import JuniorHome from "./pages/JuniorHome";
 import ProfessionalHome from "./pages/ProfessionalHome";
-
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -15,6 +14,8 @@ import JuniorClasses from "./pages/JuniorClasses";
 import JuniorTrophies from "./pages/JuniorTrophies";
 import CoursePlayer from "./pages/CoursePlayer";
 import Checkout from "./pages/Checkout";
+import OurCourses from "./pages/OurCourses";
+import BookDemo from "./pages/BookDemo";
 
 function App() {
   return (
@@ -27,7 +28,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
+        <Route path="/our-courses" element={<OurCourses />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/book-demo" element={<BookDemo />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/junior/classes" element={<JuniorClasses />} />

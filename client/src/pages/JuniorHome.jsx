@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import JuniorHeroImg from "../assets/junior-hero.png";
 import Logo from "../assets/logo.jpeg";
+import JuniorNavbar from "../components/JuniorNavbar";
+import CourseImg1 from "../assets/course1.png";
+import CourseImg2 from "../assets/course2.png";
+import CourseImg3 from "../assets/course3.png";
 
 const JuniorHome = () => {
   const navigate = useNavigate();
 
   const handleBookDemo = () => {
-    navigate("/contact");
+    navigate("/book-demo");
   };
 
   const handleWatchVideo = () => {
@@ -16,184 +20,10 @@ const JuniorHome = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFDF5] font-sans text-gray-800 selection:bg-orange-200">
-      {/* Header / Navbar */}
-      <nav className="border-b border-dashed border-gray-200 px-4 py-3 bg-white/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center border border-orange-100">
-              <img
-                src={Logo}
-                alt="JuniorLearn Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-2xl font-black text-gray-800 tracking-tight">
-              Acad<span className="text-orange-500">Learn Jr.</span>
-            </span>
-          </Link>
-          <div className="hidden md:flex gap-4">
-            <Link
-              to="/junior/classes"
-              className="font-bold hover:text-orange-500"
-            >
-              My Classes
-            </Link>
-            <Link
-              to="/junior/trophies"
-              className="font-bold hover:text-orange-500"
-            >
-              Trophies
-            </Link>
-          </div>
-          <div>
-            <button
-              onClick={handleBookDemo}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full transition-transform hover:scale-105 shadow-md shadow-orange-200"
-            >
-              Book Free Demo
-            </button>
-          </div>
-        </div>
-      </nav>
+      {/* Header / Navbar - shared across all Junior pages */}
+      <JuniorNavbar />
 
       <main>
-        {/* Section 0: Booster Section (New Addition) */}
-        <section className="container mx-auto px-4 mt-8 mb-12">
-          <div className="bg-[#FFF8E1] border-2 border-[#FFD54F] rounded-[2rem] overflow-hidden shadow-lg relative">
-            {/* Banner Header */}
-            <div className="bg-[#FFECB3] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border-b border-[#FFE082]">
-              <div className="flex-1">
-                <h2 className="text-3xl md:text-4xl font-black text-amber-900 mb-2">
-                  Boost Your Child’s Learning in{" "}
-                  <span className="text-orange-600 underline decoration-wavy decoration-2">
-                    Just 6 Days
-                  </span>
-                </h2>
-                <p className="text-amber-800 font-bold text-lg">
-                  For Classes 1st to 8th{" "}
-                  <span className="mx-2 text-amber-400">|</span> Subjects:
-                  Maths, Science, Logic
-                </p>
-              </div>
-              <div className="flex items-center gap-4 bg-white/50 px-4 py-2 rounded-xl backdrop-blur-sm">
-                <div className="text-xs font-bold text-amber-800 uppercase tracking-widest text-right">
-                  Powered by
-                  <br />
-                  <span className="text-lg text-black">AcadLearn</span>
-                </div>
-                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  A
-                </div>
-              </div>
-            </div>
-
-            {/* Content Grid */}
-            <div className="p-6 md:p-10 grid md:grid-cols-2 gap-12 items-center">
-              {/* Left: Highlights */}
-              <div className="space-y-8">
-                <div className="text-center md:text-left">
-                  <span className="inline-block bg-orange-100 text-orange-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-                    Course Highlights
-                  </span>
-                  <h3 className="text-2xl font-black text-gray-800">
-                    Learn Pro Tips in Our Exclusive Course!
-                  </h3>
-                  <div className="flex items-center justify-center md:justify-start gap-2 mt-2 text-gray-500 text-sm font-bold">
-                    <span>🏆 Trusted by 10k+ Students</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded-xl text-center border border-orange-100">
-                    <div className="text-orange-500 font-bold text-xs uppercase">
-                      Next Batch
-                    </div>
-                    <div className="text-gray-900 font-black text-lg">
-                      Jan 27, 2026
-                    </div>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl text-center border border-orange-100">
-                    <div className="text-orange-500 font-bold text-xs uppercase">
-                      Duration
-                    </div>
-                    <div className="text-gray-900 font-black text-lg">
-                      6 Days
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 text-center">
-                  <h4 className="font-bold text-orange-800 mb-1">
-                    Curriculum Aligned
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Perfect for CBSE, ICSE & State Boards
-                  </p>
-                </div>
-              </div>
-
-              {/* Right: Enrollment Card */}
-              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 max-w-md mx-auto w-full">
-                <h3 className="font-bold text-lg text-gray-900 mb-1">
-                  Mental Math Booster Course 1
-                </h3>
-                <p className="text-xs text-gray-500 font-bold mb-6">
-                  Jan 27 - Feb 01
-                </p>
-
-                <div className="bg-orange-50 border border-orange-100 p-2 rounded-lg text-center text-xs font-bold text-orange-700 mb-6">
-                  Join other curious superstars today!
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-3">
-                    Choose Class to Enroll
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((cls) => (
-                      <button
-                        key={cls}
-                        className="w-10 h-10 rounded-full border-2 border-gray-200 text-gray-600 font-bold text-sm hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 focus:bg-orange-500 focus:text-white focus:border-orange-500 transition-all"
-                      >
-                        {cls}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <input
-                    type="tel"
-                    placeholder="+91 Enter Mobile Number"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-2 text-center">
-                    Course material will be shared via WhatsApp.
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between mb-6">
-                  <div className="text-xs font-bold text-gray-500">
-                    Price Starts from
-                  </div>
-                  <div className="text-2xl font-black text-gray-900">
-                    ₹29{" "}
-                    <span className="text-sm text-gray-400 font-medium line-through">
-                      699
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => navigate("/checkout/booster-pack")}
-                  className="w-full py-4 bg-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-600 hover:scale-105 transition-all text-lg"
-                >
-                  Enroll Now
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Section 1: The Hero Section (The Hook) */}
         <section className="container mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-12">
@@ -297,7 +127,154 @@ const JuniorHome = () => {
           </div>
         </section>
 
-        {/* Section 3: The Learning Tracks */}
+        {/* Section 3: Our Courses (Junior paths) */}
+        <section
+          id="junior-courses-section"
+          className="py-20 container mx-auto px-4"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-3">
+              Our Courses
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600">
+              Pick your path to a brighter future!
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Course 1: After-School Excellence */}
+            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
+              <div className="h-40 w-full overflow-hidden">
+                <img
+                  src={CourseImg1}
+                  alt="After-School Excellence"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col">
+              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
+                After-School Excellence
+              </p>
+              <h3 className="text-2xl font-black text-slate-900 mb-2">
+                Total Academic Support
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 flex-1">
+                Give your child the edge they need to lead the class. We provide
+                comprehensive guidance to turn school challenges into daily
+                victories.
+              </p>
+              <ul className="space-y-1 text-sm text-gray-700 mb-4">
+                <li>
+                  <span className="font-semibold">Grades:</span> 3rd to 8th
+                </li>
+                <li>
+                  <span className="font-semibold">Duration:</span> 6 Days
+                  Intensive Learning &amp; Support
+                </li>
+                <li>
+                  <span className="font-semibold">Subjects:</span> English,
+                  Maths, Science &amp; Social Studies
+                </li>
+                <li>
+                  <span className="font-semibold">Curriculum:</span> Fully
+                  synced with CBSE, ICSE, and State Boards
+                </li>
+              </ul>
+              <button
+                onClick={handleBookDemo}
+                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+              >
+                Book a Demo
+              </button>
+              </div>
+            </div>
+
+            {/* Course 2: English Mastery */}
+            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
+              <div className="h-40 w-full overflow-hidden">
+                <img
+                  src={CourseImg2}
+                  alt="English Mastery"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col">
+              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
+                English Mastery
+              </p>
+              <h3 className="text-2xl font-black text-slate-900 mb-2">
+                Global Communication Skills
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 flex-1">
+                Help your child speak with confidence and precision. Our
+                specialized program prepares students for international
+                standards and real-world success.
+              </p>
+              <ul className="space-y-1 text-sm text-gray-700 mb-4">
+                <li>
+                  <span className="font-semibold">Grades:</span> 1st to 8th
+                </li>
+                <li>
+                  <span className="font-semibold">Duration:</span> 6 Days
+                </li>
+                <li>
+                  <span className="font-semibold">Focus:</span> Fluency,
+                  Grammar, and Creative Writing
+                </li>
+              </ul>
+              <button
+                onClick={handleBookDemo}
+                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+              >
+                Book a Demo
+              </button>
+              </div>
+            </div>
+
+            {/* Course 3: Advanced Mathematics */}
+            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
+              <div className="h-40 w-full overflow-hidden">
+                <img
+                  src={CourseImg3}
+                  alt="Advanced Mathematics"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col">
+              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
+                Advanced Mathematics
+              </p>
+              <h3 className="text-2xl font-black text-slate-900 mb-2">
+                The Math Genius Program
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 flex-1">
+                Master the language of logic. We teach kids to solve complex
+                problems with lightning speed, making numbers fun and intuitive.
+              </p>
+              <ul className="space-y-1 text-sm text-gray-700 mb-4">
+                <li>
+                  <span className="font-semibold">Grades:</span> 1st to 8th
+                </li>
+                <li>
+                  <span className="font-semibold">Duration:</span> 6 Days
+                </li>
+                <li>
+                  <span className="font-semibold">Focus:</span> Mental Math &
+                  Logical Reasoning
+                </li>
+              </ul>
+              <button
+                onClick={handleBookDemo}
+                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+              >
+                Book a Demo
+              </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4: The Learning Tracks */}
         <section className="py-20 container mx-auto px-4">
           <h2 className="text-4xl font-black text-center mb-16 text-slate-900">
             Learning Tracks for Every Age
@@ -375,7 +352,7 @@ const JuniorHome = () => {
           </div>
         </section>
 
-        {/* Section 4: Secret Sauce */}
+        {/* Section 5: Secret Sauce */}
         <section className="bg-[#1e293b] py-20 text-white rounded-[3rem] mx-4 my-8">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -429,7 +406,7 @@ const JuniorHome = () => {
           </div>
         </section>
 
-        {/* Section 5: Project Gallery */}
+        {/* Section 6: Project Gallery */}
         <section className="py-20 overflow-hidden">
           <div className="container mx-auto px-4 mb-12 flex justify-between items-end">
             <h2 className="text-4xl font-black text-slate-900 max-w-lg">
@@ -507,7 +484,7 @@ const JuniorHome = () => {
           </div>
         </section>
 
-        {/* Section 6: Trust Section */}
+        {/* Section 7: Trust Section */}
         <section className="bg-orange-50 py-24">
           <div className="container mx-auto px-4 text-center max-w-4xl">
             <h2 className="text-3xl font-black mb-16 text-slate-900">
@@ -544,7 +521,7 @@ const JuniorHome = () => {
           </div>
         </section>
 
-        {/* Section 7: Final Footer */}
+        {/* Section 8: Final Footer */}
         <section className="py-20 bg-slate-900 text-center text-white">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-4xl md:text-5xl font-black mb-6">

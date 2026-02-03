@@ -1,27 +1,36 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import JuniorNavbar from "../components/JuniorNavbar";
 
 const CoursePlayer = () => {
   const { id } = useParams();
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center">
-      <div className="absolute top-8 left-8">
-        <Link to="/junior" className="text-gray-400 hover:text-white font-bold">
+    <div className="min-h-screen bg-[#FFFDF5] font-sans text-gray-800 selection:bg-orange-200">
+      <JuniorNavbar />
+      <main className="container mx-auto px-4 py-10">
+        <Link
+          to="/junior"
+          className="inline-block mb-6 text-orange-500 font-bold hover:underline"
+        >
           ← Exit Quest
         </Link>
-      </div>
-      <div className="text-6xl mb-8">🎮</div>
-      <h1 className="text-4xl font-bold mb-4">Playing Course: {id}</h1>
-      <p className="text-xl text-gray-400 max-w-xl text-center">
-        This is where the interactive lesson or game would load. Get ready for
-        an adventure!
-      </p>
-      <div className="mt-12 w-full max-w-3xl aspect-video bg-gray-800 rounded-xl flex items-center justify-center border border-gray-700">
-        <span className="text-gray-600 font-mono">
-          Course Content Placeholder
-        </span>
-      </div>
+        <div className="flex flex-col items-center text-center">
+          <div className="text-6xl mb-6">🎮</div>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+            Playing Course: {id}
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
+            This is where the interactive lesson or game would load. Get ready
+            for an adventure!
+          </p>
+          <div className="mt-4 w-full max-w-3xl aspect-video bg-slate-900 rounded-3xl flex items-center justify-center border-4 border-slate-800 shadow-xl">
+            <span className="text-slate-400 font-mono text-sm md:text-base">
+              Course Content Placeholder
+            </span>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
