@@ -144,19 +144,16 @@ const ActionModal = ({ booking, onClose, onSave }) => {
 const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSessions = [], onBookDemo }) => {
   const [filter,         setFilter]         = useState("all");
   const [activeBooking,  setActiveBooking]  = useState(null);
-  const [carouselIdx,    setCarouselIdx]    = useState(0);
 
   const shown   = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
   const isAdmin = user?.role === "admin";
 
   // All upcoming sessions (today or future), sorted soonest first
   const upcomingSessions = demoSessions.filter((s) => daysUntil(s.date) >= 0);
-  const prev = () => setCarouselIdx((i) => (i - 1 + upcomingSessions.length) % upcomingSessions.length);
-  const next = () => setCarouselIdx((i) => (i + 1) % upcomingSessions.length);
 
   return (
     <div>
-      {/* ── Demo Sessions Carousel (Students only) ── */}
+      {/* ── Demo Sessions List (Students only) ── */}
       {!isAdmin && upcomingSessions.length > 0 && (
         <div className="bg-white rounded-2xl border border-orange-200 shadow-sm overflow-hidden mb-6">
           {/* Header */}
@@ -168,123 +165,79 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
             </span>
           </div>
 
-          {/* Carousel slide */}
-          {(() => {
-            const s = upcomingSessions[carouselIdx];
-            const d = daysUntil(s.date);
-            const dayLabel = d === 0 ? "Today" : d === 1 ? "Tomorrow" : `In ${d} days`;
-            const isVeryNear = d <= 2;
+          {/* Sessions list */}
+          <div className="divide-y divide-gray-100">
+            {upcomingSessions.map((s) => {
+              const d = daysUntil(s.date);
+              const dayLabel = d === 0 ? "Today" : d === 1 ? "Tomorrow" : `In ${d} days`;
+              const isVeryNear = d <= 2;
 
-            return (
-              <div className="px-6 py-5">
-                <div className={`rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-5 ${
-                  isVeryNear ? "bg-orange-50 border border-orange-200" : "bg-gray-50 border border-gray-100"
-                }`}>
-                  {/* Big date block */}
-                  <div className={`shrink-0 w-20 h-20 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm ${
-                    isVeryNear ? "bg-orange-500 text-white" : "bg-white text-slate-700 border border-gray-200"
-                  }`}>
-                    <p className="text-2xl font-bold leading-none">{new Date(s.date).getDate()}</p>
-                    <p className="text-xs font-semibold uppercase tracking-wide mt-0.5">
-                      {new Date(s.date).toLocaleString("en-IN", { month: "short" })}
-                    </p>
-                    <p className="text-[10px] mt-0.5 opacity-75">
-                      {new Date(s.date).getFullYear()}
-                    </p>
-                  </div>
+              return (
+                <div key={s._id} className="px-6 py-5 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    {/* Date block */}
+                    <div className={`shrink-0 w-16 h-16 rounded-xl flex flex-col items-center justify-center text-center shadow-sm ${
+                      isVeryNear ? "bg-orange-500 text-white" : "bg-white text-slate-700 border border-gray-200"
+                    }`}>
+                      <p className="text-xl font-bold leading-none">{new Date(s.date).getDate()}</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide mt-0.5">
+                        {new Date(s.date).toLocaleString("en-IN", { month: "short" })}
+                      </p>
+                    </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h3 className="text-base font-bold text-slate-800">{s.title}</h3>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        isVeryNear ? "bg-orange-200 text-orange-700" : "bg-gray-200 text-gray-600"
-                      }`}>
-                        {dayLabel}
-                      </span>
-                      {s.type === "free" ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                          FREE
-                        </span>
-                      ) : (
-                        <>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                            PAID
-                          </span>
-                          {s.price > 0 && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">
-                              ₹{s.price}
-                            </span>
-                          )}
-                        </>
-                      )}
-                      {s.category !== "all" && (
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
-                          s.category === "junior" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h3 className="text-sm font-bold text-slate-800">{s.title}</h3>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isVeryNear ? "bg-orange-200 text-orange-700" : "bg-gray-200 text-gray-600"
                         }`}>
-                          {s.category}
+                          {dayLabel}
                         </span>
+                        {s.type === "free" ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                            FREE
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                              PAID
+                            </span>
+                            {s.price > 0 && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">
+                                ₹{s.price}
+                              </span>
+                            )}
+                          </>
+                        )}
+                        {s.category !== "all" && (
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
+                            s.category === "junior" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                          }`}>
+                            {s.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-600 font-medium">
+                        {s.time} &nbsp;·&nbsp; {s.instructor}
+                      </p>
+                      {s.description && (
+                        <p className="text-xs text-gray-400 mt-1 line-clamp-1">{s.description}</p>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 font-medium">
-                      {s.time} &nbsp;·&nbsp; {s.instructor}
-                    </p>
-                    {s.description && (
-                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{s.description}</p>
-                    )}
-                  </div>
 
-                  {/* Book Now */}
-                  <button
-                    onClick={() => onBookDemo(sessionToCls(s))}
-                    className="shrink-0 px-5 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
-                  >
-                    Book Now
-                  </button>
+                    {/* Book Now */}
+                    <button
+                      onClick={() => onBookDemo(sessionToCls(s))}
+                      className="shrink-0 px-4 py-2 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
+                    >
+                      Book Now
+                    </button>
+                  </div>
                 </div>
-
-                {/* Carousel controls */}
-                {upcomingSessions.length > 1 && (
-                  <div className="flex items-center justify-between mt-4">
-                    {/* Prev */}
-                    <button
-                      onClick={prev}
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-500 hover:text-orange-600 flex items-center justify-center transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-
-                    {/* Dots */}
-                    <div className="flex items-center gap-1.5">
-                      {upcomingSessions.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCarouselIdx(i)}
-                          className={`rounded-full transition-all ${
-                            i === carouselIdx
-                              ? "w-5 h-2 bg-orange-500"
-                              : "w-2 h-2 bg-gray-300 hover:bg-orange-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Next */}
-                    <button
-                      onClick={next}
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-500 hover:text-orange-600 flex items-center justify-center transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+              );
+            })}
+          </div>
         </div>
       )}
 
