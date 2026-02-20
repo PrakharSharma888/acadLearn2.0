@@ -22,7 +22,7 @@ export const STATUS_STYLES = {
 // ── Sidebar nav items (labels + keys only — icons live in DashboardSidebar) ──
 export const NAV_ITEMS = [
   { key: "overview", label: "Dashboard", path: "/dashboard/overview" },
-  { key: "classes", label: "My Classes", path: "/dashboard/classes" },
+  { key: "classes", label: "Courses", path: "/dashboard/classes" },
   { key: "bookings", label: "Demo Bookings", path: "/dashboard/bookings" },
   { key: "progress", label: "Progress", path: "/dashboard/progress" },
   { key: "profile", label: "Profile", path: "/dashboard/profile" },

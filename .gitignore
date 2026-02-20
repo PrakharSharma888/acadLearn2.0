@@ -25,3 +25,4 @@ bun.*
 server/*
 
 node_modules
+*.md

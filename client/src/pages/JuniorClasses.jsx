@@ -13,7 +13,7 @@ const JuniorClasses = () => {
         >
           ← Back to Junior Home
         </Link>
-        <h1 className="text-4xl font-black text-gray-800 mb-3">My Classes</h1>
+        <h1 className="text-4xl font-black text-gray-800 mb-3">Courses</h1>
         <p className="text-lg md:text-xl text-gray-600">
           Here are the classes you are currently enrolled in. Keep learning!
         </p>
