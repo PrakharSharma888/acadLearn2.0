@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import API_BASE from "../config/api";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const Signup = () => {
     try {
       // Using hosted backend
       const response = await fetch(
-        "https://acad-learn2-backend.vercel.app/api/auth/register",
+        `${API_BASE}/api/auth/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
