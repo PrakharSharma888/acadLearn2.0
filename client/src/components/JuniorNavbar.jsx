@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 // import junior_logo from "../assets/junior_logo.png";
 import junior_logo_mob from "../assets/acad_learn _symbol.png";
@@ -7,6 +7,22 @@ const JuniorNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
+
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      setUser(userInfo);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userInfo");
+    setUser(null);
+    navigate("/login");
+  };
 
   const handleBookDemo = () => {
     navigate("/book-demo");
@@ -90,24 +106,46 @@ const JuniorNavbar = () => {
 
         {/* Right: Auth + primary CTA for Junior */}
         <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 border border-orange-100 rounded-full hover:bg-orange-50 transition-colors"
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600 shadow-sm transition-colors"
-          >
-            Register
-          </Link>
-          <button
+          {user ?
+            <>
+              <Link
+                to="/dashboard"
+                className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+              >
+                Logout
+              </button>
+              <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              </div>
+            </>
+            : (
+              <>
+                <Link
+                  to="/login"
+                  className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 border border-orange-100 rounded-full hover:bg-orange-50 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600 shadow-sm transition-colors"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          {/* <button
             onClick={handleBookDemo}
             className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-[#111827] text-white font-bold rounded-full shadow-md shadow-orange-200 hover:bg-black hover:scale-105 transition-transform"
           >
             Book a Demo
-          </button>
+          </button> */}
           <button
             onClick={() => setOpen(!open)}
             className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition"
