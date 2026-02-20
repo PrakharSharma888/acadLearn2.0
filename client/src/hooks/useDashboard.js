@@ -75,20 +75,23 @@ const useDashboard = () => {
         method: "DELETE",
         headers: authHeader(user.token),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Could not cancel booking.");
+      }
       await loadBookings();
-    } catch {
-      alert("Could not cancel booking. Please try again.");
+    } catch (err) {
+      alert(err.message || "Could not cancel booking. Please try again.");
     }
   };
 
   // ── Update booking status (Admin) ─────────────────────────────────────────
-  const handleStatusUpdate = async (id, newStatus, confirmedDate) => {
+  const handleStatusUpdate = async (id, newStatus, confirmedDate, confirmedTime) => {
     try {
       const res = await fetch(`${API_BASE}/api/demo-booking/${id}/status`, {
         method: "PUT",
         headers: authHeader(user.token),
-        body: JSON.stringify({ status: newStatus, confirmedDate: confirmedDate || "" }),
+        body: JSON.stringify({ status: newStatus, confirmedDate: confirmedDate || "", confirmedTime: confirmedTime || "" }),
       });
       if (!res.ok) throw new Error();
       await loadBookings();

@@ -26,4 +26,5 @@ export const NAV_ITEMS = [
   { key: "bookings",  label: "Demo Bookings" },
   { key: "progress",  label: "Progress" },
   { key: "profile",   label: "Profile" },
+  { key: "admin",     label: "Admin Panel", adminOnly: true },
 ];

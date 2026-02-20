@@ -8,6 +8,7 @@ import ClassesTab     from "../dashboard/ClassesTab";
 import BookingsTab    from "../dashboard/BookingsTab";
 import ProgressTab    from "../dashboard/ProgressTab";
 import ProfileTab     from "../dashboard/ProfileTab";
+import AdminTab       from "../dashboard/AdminTab";
 
 const Dashboard = () => {
   const [activeNav,    setActiveNav]    = useState("dashboard");
@@ -55,6 +56,8 @@ const Dashboard = () => {
         return <ProgressTab bookings={bookings} classes={classes} />;
       case "profile":
         return <ProfileTab user={user} token={user.token} onUserUpdate={setUser} />;
+      case "admin":
+        return <AdminTab token={user.token} />;
       default:
         return null;
     }

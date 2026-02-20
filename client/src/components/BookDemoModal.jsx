@@ -6,7 +6,6 @@ const initialState = {
   phone: "",
   email: "",
   studentName: "",
-  grade: "",
 };
 
 // ── Theme tokens by category ─────────────────────────────────────────────────
@@ -47,21 +46,14 @@ const BookDemoModal = ({ cls, user, onClose }) => {
   const [loading,  setLoading]  = useState(false);
   const [success,  setSuccess]  = useState(false);
 
-  // Pre-fill from logged-in user + derive grade from class title each time modal opens
+  // Pre-fill from logged-in user each time modal opens
   useEffect(() => {
-    const gradeMatch = cls?.title?.match(/\b(\d{1,2})\b/);
-    const derivedGrade = cls?.grade
-      ? String(cls.grade)
-      : gradeMatch
-      ? `Grade ${gradeMatch[1]}`
-      : "";
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
       email:      user?.email || "",
       parentName: user?.name  || "",
-      grade:      derivedGrade,
     });
   }, [cls, user]);
 
@@ -82,7 +74,6 @@ const BookDemoModal = ({ cls, user, onClose }) => {
     if (!/^[6-9]\d{9}$/.test(formData.phone))    e.phone        = "Enter a valid 10-digit mobile number";
     if (!/^\S+@\S+\.\S+$/.test(formData.email))  e.email        = "Enter a valid email address";
     if (!formData.studentName.trim())             e.studentName  = "Student name is required";
-    if (!formData.grade.trim())                   e.grade        = "Grade / class is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -92,6 +83,13 @@ const BookDemoModal = ({ cls, user, onClose }) => {
     if (!validate()) return;
     setLoading(true);
     try {
+      const gradeMatch = cls?.title?.match(/\b(\d{1,2})\b/);
+      const grade = cls?.grade
+        ? String(cls.grade)
+        : gradeMatch
+        ? `Grade ${gradeMatch[1]}`
+        : cls?.title || "";
+
       const res = await fetch(`${API_BASE}/api/demo-booking`, {
         method:  "POST",
         headers: {
@@ -100,6 +98,7 @@ const BookDemoModal = ({ cls, user, onClose }) => {
         },
         body: JSON.stringify({
           ...formData,
+          grade,
           classId:   cls?._id   || null,
           className: cls?.title || "",
         }),
@@ -118,19 +117,12 @@ const BookDemoModal = ({ cls, user, onClose }) => {
 
   // Reset form so user can book again without closing modal
   const handleBookAnother = () => {
-    const gradeMatch = cls?.title?.match(/\b(\d{1,2})\b/);
-    const derivedGrade = cls?.grade
-      ? String(cls.grade)
-      : gradeMatch
-      ? `Grade ${gradeMatch[1]}`
-      : "";
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
       email:      user?.email || "",
       parentName: user?.name  || "",
-      grade:      derivedGrade,
     });
   };
 
@@ -138,8 +130,6 @@ const BookDemoModal = ({ cls, user, onClose }) => {
     `w-full rounded-xl border px-3.5 py-2.5 text-sm bg-gray-50 outline-none transition ${theme.ring} ${
       errors[name] ? "border-red-400 bg-red-50" : "border-gray-200"
     }`;
-
-  const gradeAutoFilled = !!(cls?.grade || cls?.title?.match(/\b(\d{1,2})\b/));
 
   const FIELDS = [
     { label: "Parent's Name",   name: "parentName",  type: "text",  placeholder: "e.g. Rahul Sharma" },
@@ -229,27 +219,6 @@ const BookDemoModal = ({ cls, user, onClose }) => {
                 )}
               </div>
             ))}
-
-            {/* Grade — auto-filled from the selected class */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">
-                Grade / Class
-                {gradeAutoFilled && (
-                  <span className="ml-2 text-[10px] font-normal text-gray-400">(auto-filled)</span>
-                )}
-              </label>
-              <input
-                name="grade"
-                type="text"
-                value={formData.grade}
-                onChange={handleChange}
-                placeholder="e.g. Grade 5 or Class 8"
-                className={inputCls("grade")}
-              />
-              {errors.grade && (
-                <p className="text-xs text-red-500 mt-1">{errors.grade}</p>
-              )}
-            </div>
 
             {errors.submit && (
               <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
