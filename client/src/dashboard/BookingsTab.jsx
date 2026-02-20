@@ -223,6 +223,47 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
     finally { setSessionSaving(false); }
   };
 
+  // Custom Calendar State
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  
+  const getBookingForDate = (date) => {
+    if (!bookings) return null;
+    // Use local date comparison to avoid timezone issues
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    return bookings.find(b => {
+      if (b.status !== 'confirmed' || !b.confirmedDate) return false;
+      const bookingDate = new Date(b.confirmedDate);
+      return bookingDate.getFullYear() === year &&
+             bookingDate.getMonth() === month &&
+             bookingDate.getDate() === day;
+    });
+  };
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    return { daysInMonth, startingDayOfWeek, year, month };
+  };
+
+  const changeMonth = (increment) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + increment, 1));
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+  };
+
   return (
     <div>
       {/* ── Demo Sessions List (Students only) ── */}
@@ -349,7 +390,6 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSessionSubmit} className="p-6 space-y-5">(
             <form onSubmit={handleSessionSubmit} className="p-6 space-y-5">
               {/* Link to class (optional) */}
               <div>
@@ -516,26 +556,30 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
         </div>
       </div>
 
-      {loading && (
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
-        </div>
-      )}
+      {/* Two column layout for students: bookings list + calendar */}
+      <div className={`grid ${!isAdmin ? 'lg:grid-cols-3 gap-6' : 'grid-cols-1'}`}>
+        {/* Bookings List */}
+        <div className={!isAdmin ? 'lg:col-span-2' : ''}>
+          {loading && (
+            <div className="space-y-3">
+              {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
+            </div>
+          )}
 
-      {!loading && shown.length === 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-14 text-center shadow-sm">
-          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <p className="text-gray-400 text-sm">No bookings found.</p>
-        </div>
-      )}
+          {!loading && shown.length === 0 && (
+            <div className="bg-white border border-gray-100 rounded-2xl p-14 text-center shadow-sm">
+              <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-400 text-sm">No bookings found.</p>
+            </div>
+          )}
 
-      {!loading && shown.length > 0 && (
-        <div className="space-y-3">
-          {shown.map((b) => (
+          {!loading && shown.length > 0 && (
+            <div className="space-y-3">
+              {shown.map((b) => (
             <div key={b._id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                 {/* Icon */}
@@ -612,6 +656,125 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
           ))}
         </div>
       )}
+        </div>
+
+        {/* Calendar (Students only) */}
+        {!isAdmin && !loading && (
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sticky top-4">
+              {/* Calendar Header */}
+              <div className="bg-gradient-to-r from-orange-500 to-amber-400 p-4 text-white">
+                <div className="flex items-center gap-1.5 text-xs text-orange-100">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Scheduled Demo Sessions
+                </div>
+              </div>
+
+              {/* Calendar */}
+              <div className="p-4 calendar-wrapper">
+                {/* Calendar Navigation */}
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={() => changeMonth(-1)}
+                    className="calendar-nav-btn"
+                    aria-label="Previous month"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <h3 className="calendar-month-label">
+                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h3>
+                  <button
+                    onClick={() => changeMonth(1)}
+                    className="calendar-nav-btn"
+                    aria-label="Next month"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Weekday Headers */}
+                <div className="calendar-weekdays">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="calendar-weekday">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="calendar-grid">
+                  {(() => {
+                    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
+                    const days = [];
+
+                    // Empty cells before first day
+                    for (let i = 0; i < startingDayOfWeek; i++) {
+                      days.push(<div key={`empty-${i}`} className="calendar-day-empty" />);
+                    }
+
+                    // Calendar days
+                    for (let day = 1; day <= daysInMonth; day++) {
+                      const date = new Date(year, month, day);
+                      const isTodayDate = isToday(date);
+                      const booking = getBookingForDate(date);
+                      const hasBooking = !!booking;
+
+                      days.push(
+                        <div
+                          key={day}
+                          className={`calendar-day ${
+                            isTodayDate
+                              ? 'calendar-day-today'
+                              : hasBooking
+                              ? 'calendar-day-booking'
+                              : ''
+                          }`}
+                        >
+                          <span className="calendar-day-number">{day}</span>
+                          {hasBooking && (
+                            <div className="booking-indicator">
+                              <div className="booking-dot" />
+                              <div className="booking-tooltip">
+                                <p className="font-bold text-xs">{booking.className}</p>
+                                {booking.confirmedTime && (
+                                  <p className="text-[10px] text-gray-300 mt-0.5">{booking.confirmedTime}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return days;
+                  })()}
+                </div>
+
+                {/* Legend */}
+                <div className="mt-4 pt-3 border-t border-gray-100 space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-5 h-5 rounded bg-orange-500" />
+                    <span className="text-gray-600">Today</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-5 h-5 rounded bg-green-100 border border-green-200 flex items-center justify-center">
+                      <div className="w-1 h-1 rounded-full bg-green-600" />
+                    </div>
+                    <span className="text-gray-600">Scheduled Demo</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Admin action modal */}
       {activeBooking && (
