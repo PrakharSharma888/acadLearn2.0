@@ -14,7 +14,7 @@ const LandingPage = () => {
         <div className="text-center mb-16 md:mb-24">
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             Where would you like to <br />
-            <span className="text-blue-500">start learning</span> today?
+            <span className="text-orange-500">start learning</span> today?
           </h1>
           <p className="text-xl text-gray-500 max-w-3xl mx-auto">
             Choose your dedicated path. Whether you're advancing your career or
@@ -112,7 +112,7 @@ const LandingPage = () => {
 
           {/* Juniors Card */}
           <div className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-            <div className="h-64 bg-emerald-50 relative overflow-hidden group">
+            <div className="h-64 bg-orange-50 relative overflow-hidden group">
               <img
                 src={LandingJuniorImg}
                 alt="Junior Learning"
@@ -120,7 +120,7 @@ const LandingPage = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
 
-              <div className="absolute bottom-6 left-6 w-16 h-16 bg-emerald-100/90 backdrop-blur-sm rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg z-20">
+              <div className="absolute bottom-6 left-6 w-16 h-16 bg-orange-100/90 backdrop-blur-sm rounded-2xl flex items-center justify-center text-orange-600 shadow-lg z-20">
                 <svg
                   className="w-9 h-9"
                   fill="currentColor"
@@ -145,7 +145,7 @@ const LandingPage = () => {
                       key={i}
                       className="flex items-center text-gray-700 font-medium"
                     >
-                      <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white mr-3 shadow-sm">
+                      <span className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white mr-3 shadow-sm">
                         <svg
                           className="w-3 h-3"
                           fill="none"
@@ -168,7 +168,7 @@ const LandingPage = () => {
 
               <Link
                 to="/junior"
-                className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center group"
+                className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center group"
               >
                 Enter Junior Zone
                 <svg
@@ -194,16 +194,16 @@ const LandingPage = () => {
       <footer className="bg-white py-10 mt-10 border-t border-gray-100">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center gap-8 mb-6 text-sm font-semibold text-gray-600">
-            <Link to="/about" className="hover:text-blue-600">
+            <Link to="/about" className="hover:text-orange-600">
               About Us
             </Link>
-            <Link to="/contact" className="hover:text-blue-600">
+            <Link to="/contact" className="hover:text-orange-600">
               Contact
             </Link>
-            <Link to="/privacy" className="hover:text-blue-600">
+            <Link to="/privacy" className="hover:text-orange-600">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="hover:text-blue-600">
+            <Link to="/terms" className="hover:text-orange-600">
               Terms of Service
             </Link>
           </div>

@@ -14,7 +14,7 @@ const JuniorNavbar = () => {
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
-      setUser(userInfo);
+      setUser(JSON.parse(userInfo));
     }
   }, []);
 
@@ -162,10 +162,25 @@ const JuniorNavbar = () => {
               About Us
             </Link>
 
-            <Link
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                const scrollToCourses = () => {
+                  const el = document.getElementById("junior-courses-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                };
+                if (location.pathname === "/junior") {
+                  scrollToCourses();
+                } else {
+                  navigate("/junior");
+                  setTimeout(scrollToCourses, 300);
+                }
+              }}
+              className="text-left"
             >
               Our Courses
-            </Link>
+            </button>
 
             <Link to="/contact" onClick={() => setOpen(false)}>
               Contact Us

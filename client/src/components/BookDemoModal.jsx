@@ -7,7 +7,6 @@ const initialState = {
   email: "",
   studentName: "",
   grade: "",
-  preferredDate: "",
 };
 
 // ── Theme tokens by category ─────────────────────────────────────────────────
@@ -26,17 +25,17 @@ const THEME = {
     numberBg:    "bg-orange-100 text-orange-600",
   },
   professional: {
-    header:      "bg-linear-to-r from-orange-600 to-amber-600",
-    label:       "text-orange-200",
-    subtext:     "text-orange-200",
-    ring:        "focus:ring-orange-200 focus:border-orange-400",
-    btn:         "bg-orange-600 hover:bg-orange-700 active:bg-orange-800",
-    btnOutline:  "border-orange-600 text-orange-600 hover:bg-orange-50",
+    header:      "bg-linear-to-r from-blue-600 to-blue-500",
+    label:       "text-blue-100",
+    subtext:     "text-blue-100",
+    ring:        "focus:ring-blue-200 focus:border-blue-400",
+    btn:         "bg-blue-600 hover:bg-blue-700 active:bg-blue-800",
+    btnOutline:  "border-blue-600 text-blue-600 hover:bg-blue-50",
     badge:       "Professional",
-    successBtn:  "bg-orange-600 hover:bg-orange-700",
-    successRing: "bg-orange-50 text-orange-500",
-    dot:         "bg-orange-500",
-    numberBg:    "bg-orange-100 text-orange-600",
+    successBtn:  "bg-blue-600 hover:bg-blue-700",
+    successRing: "bg-blue-50 text-blue-500",
+    dot:         "bg-blue-500",
+    numberBg:    "bg-blue-100 text-blue-600",
   },
 };
 
@@ -48,14 +47,21 @@ const BookDemoModal = ({ cls, user, onClose }) => {
   const [loading,  setLoading]  = useState(false);
   const [success,  setSuccess]  = useState(false);
 
-  // Pre-fill from logged-in user each time modal opens fresh
+  // Pre-fill from logged-in user + derive grade from class title each time modal opens
   useEffect(() => {
+    const gradeMatch = cls?.title?.match(/\b(\d{1,2})\b/);
+    const derivedGrade = cls?.grade
+      ? String(cls.grade)
+      : gradeMatch
+      ? `Grade ${gradeMatch[1]}`
+      : "";
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
       email:      user?.email || "",
       parentName: user?.name  || "",
+      grade:      derivedGrade,
     });
   }, [cls, user]);
 
@@ -88,12 +94,14 @@ const BookDemoModal = ({ cls, user, onClose }) => {
     try {
       const res = await fetch(`${API_BASE}/api/demo-booking`, {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(user?.token ? { Authorization: `Bearer ${user.token}` } : {}),
+        },
         body: JSON.stringify({
           ...formData,
-          userId:    user?._id    || null,
-          classId:   cls?._id     || null,
-          className: cls?.title   || "",
+          classId:   cls?._id   || null,
+          className: cls?.title || "",
         }),
       });
       if (!res.ok) {
@@ -110,12 +118,19 @@ const BookDemoModal = ({ cls, user, onClose }) => {
 
   // Reset form so user can book again without closing modal
   const handleBookAnother = () => {
+    const gradeMatch = cls?.title?.match(/\b(\d{1,2})\b/);
+    const derivedGrade = cls?.grade
+      ? String(cls.grade)
+      : gradeMatch
+      ? `Grade ${gradeMatch[1]}`
+      : "";
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
       email:      user?.email || "",
       parentName: user?.name  || "",
+      grade:      derivedGrade,
     });
   };
 
@@ -124,12 +139,13 @@ const BookDemoModal = ({ cls, user, onClose }) => {
       errors[name] ? "border-red-400 bg-red-50" : "border-gray-200"
     }`;
 
+  const gradeAutoFilled = !!(cls?.grade || cls?.title?.match(/\b(\d{1,2})\b/));
+
   const FIELDS = [
     { label: "Parent's Name",   name: "parentName",  type: "text",  placeholder: "e.g. Rahul Sharma" },
     { label: "Phone Number",    name: "phone",        type: "tel",   placeholder: "10-digit mobile number" },
     { label: "Email Address",   name: "email",        type: "email", placeholder: "you@example.com" },
     { label: "Student's Name",  name: "studentName",  type: "text",  placeholder: "Child's full name" },
-    { label: "Grade / Class",   name: "grade",        type: "text",  placeholder: "e.g. Grade 5 or Class 8" },
   ];
 
   return (
@@ -214,19 +230,25 @@ const BookDemoModal = ({ cls, user, onClose }) => {
               </div>
             ))}
 
-            {/* Preferred date — optional */}
+            {/* Grade — auto-filled from the selected class */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
-                Preferred Date <span className="font-normal text-gray-400">(optional)</span>
+                Grade / Class
+                {gradeAutoFilled && (
+                  <span className="ml-2 text-[10px] font-normal text-gray-400">(auto-filled)</span>
+                )}
               </label>
               <input
-                name="preferredDate"
-                type="date"
-                value={formData.preferredDate}
+                name="grade"
+                type="text"
+                value={formData.grade}
                 onChange={handleChange}
-                min={new Date().toISOString().split("T")[0]}
-                className={`w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm bg-gray-50 outline-none transition ${theme.ring}`}
+                placeholder="e.g. Grade 5 or Class 8"
+                className={inputCls("grade")}
               />
+              {errors.grade && (
+                <p className="text-xs text-red-500 mt-1">{errors.grade}</p>
+              )}
             </div>
 
             {errors.submit && (

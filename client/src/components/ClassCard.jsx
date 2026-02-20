@@ -10,11 +10,11 @@ const THEME = {
     btnSecondary: "border-2 border-orange-500 text-orange-600 hover:bg-orange-50 active:bg-orange-100",
   },
   professional: {
-    iconBg:       "bg-orange-50 text-orange-600",
+    iconBg:       "bg-blue-50 text-blue-600",
     currBg:       "bg-gray-50 hover:bg-gray-100",
-    currNum:      "bg-orange-100 text-orange-600",
-    btnPrimary:   "bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white",
-    btnSecondary: "border-2 border-orange-600 text-orange-600 hover:bg-orange-50 active:bg-orange-100",
+    currNum:      "bg-blue-100 text-blue-600",
+    btnPrimary:   "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white",
+    btnSecondary: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100",
   },
 };
 

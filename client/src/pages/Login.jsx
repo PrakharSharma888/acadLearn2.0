@@ -21,7 +21,7 @@ const Login = () => {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem("userInfo", JSON.stringify(data));
-        navigate("/");
+        navigate("/dashboard");
       } else {
         alert(data.message);
       }
@@ -53,9 +53,9 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <labelAndPassword className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
-            </labelAndPassword>
+            </label>
             <input
               type="email"
               required
