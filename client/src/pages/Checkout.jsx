@@ -10,7 +10,7 @@ const Checkout = () => {
       <div className="container mx-auto px-4 py-16 max-w-2xl">
         <Link
           to="/professional"
-          className="text-blue-600 hover:underline mb-8 inline-block"
+          className="text-orange-600 hover:underline mb-8 inline-block"
         >
           ← Back to Courses
         </Link>
@@ -34,7 +34,7 @@ const Checkout = () => {
             </div>
           </div>
 
-          <button className="w-full py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="w-full py-4 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition-colors">
             Complete Purchase
           </button>
           <p className="text-center text-xs text-gray-400 mt-4">

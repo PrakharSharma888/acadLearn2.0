@@ -110,7 +110,7 @@ const JuniorNavbar = () => {
             <>
               <Link
                 to="/dashboard"
-                className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                className="font-semibold text-orange-600 hover:text-orange-700 transition-colors"
               >
                 Dashboard
               </Link>
@@ -120,7 +120,7 @@ const JuniorNavbar = () => {
               >
                 Logout
               </button>
-              <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-8 h-8 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
                 {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
             </>

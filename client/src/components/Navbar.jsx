@@ -37,7 +37,7 @@ const Navbar = () => {
             <>
               <Link
                 to="/dashboard"
-                className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                className="font-semibold text-orange-500 hover:text-orange-600 transition-colors"
               >
                 Dashboard
               </Link>
@@ -47,7 +47,7 @@ const Navbar = () => {
               >
                 Logout
               </button>
-              <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-8 h-8 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
                 {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
             </>
@@ -55,13 +55,13 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="font-semibold text-gray-600 hover:text-primary transition-colors"
+                className="font-semibold text-gray-600 hover:text-orange-500 transition-colors"
               >
                 Log In
               </Link>
               <Link
                 to="/signup"
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors"
               >
                 Sign Up
               </Link>

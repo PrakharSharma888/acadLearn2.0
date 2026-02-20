@@ -50,7 +50,7 @@ const ProfessionalHome = () => {
               />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              AcadLearn <span className="text-blue-600">Pro</span>
+              AcadLearn <span className="text-orange-600">Pro</span>
             </span>
           </Link>
 
@@ -58,21 +58,21 @@ const ProfessionalHome = () => {
             <a
               href="#"
               onClick={(e) => handleNavClick("courses-section", e)}
-              className="hover:text-blue-600"
+              className="hover:text-orange-600"
             >
               Browse Courses
             </a>
             <a
               href="#"
               onClick={(e) => handleNavClick("pricing", e)}
-              className="hover:text-blue-600"
+              className="hover:text-orange-600"
             >
               Pricing
             </a>
             <a
               href="#"
               onClick={(e) => handleNavClick("teams", e)}
-              className="hover:text-blue-600"
+              className="hover:text-orange-600"
             >
               For Teams
             </a>
@@ -87,7 +87,7 @@ const ProfessionalHome = () => {
             </Link>
             <Link
               to="/signup"
-              className="px-5 py-2 text-sm font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition-colors"
+              className="px-5 py-2 text-sm font-semibold bg-orange-600 text-white rounded hover:bg-orange-700 shadow-sm transition-colors"
             >
               Sign Up
             </Link>
@@ -123,7 +123,7 @@ const ProfessionalHome = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Advance Your Career with <br /> Expert-Led Courses
             </h1>
-            <p className="text-blue-100 text-lg mb-10">
+            <p className="text-orange-100 text-lg mb-10">
               Join 50,000+ professionals mastering new skills today.
             </p>
 
@@ -151,7 +151,7 @@ const ProfessionalHome = () => {
               </div>
               <button
                 onClick={handleSearch}
-                className="px-8 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
+                className="px-8 py-3 bg-orange-600 text-white font-semibold rounded hover:bg-orange-700 transition-colors"
               >
                 Search
               </button>
@@ -162,7 +162,7 @@ const ProfessionalHome = () => {
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+            <div className="p-3 bg-orange-100 text-orange-600 rounded-lg">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
               </svg>
@@ -175,7 +175,7 @@ const ProfessionalHome = () => {
             </div>
           </div>
           <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+            <div className="p-3 bg-orange-100 text-orange-600 rounded-lg">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4.002z" />
               </svg>
@@ -188,7 +188,7 @@ const ProfessionalHome = () => {
             </div>
           </div>
           <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+            <div className="p-3 bg-orange-100 text-orange-600 rounded-lg">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -219,7 +219,7 @@ const ProfessionalHome = () => {
                 // Clear filter logic would go here
                 setActiveCategory("All Courses");
               }}
-              className="text-blue-600 text-sm font-semibold hover:underline flex items-center"
+              className="text-orange-600 text-sm font-semibold hover:underline flex items-center"
             >
               View All{" "}
               <svg
@@ -285,7 +285,7 @@ const ProfessionalHome = () => {
               price="$129.99"
               rating="4.9"
               tags={["Strategy", "Agile", "Leadership"]}
-              imageColor="bg-indigo-800"
+              imageColor="bg-orange-800"
               image={Pro2}
             />
             <ProCourseCard
@@ -350,26 +350,26 @@ const ProfessionalHome = () => {
                 <li>• Community support</li>
                 <li>• Mobile app access</li>
               </ul>
-              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
+              <button className="w-full py-3 border border-orange-600 text-orange-600 font-bold rounded-lg hover:bg-orange-50">
                 Start Free Trial
               </button>
             </div>
-            <div className="border border-blue-600 bg-blue-50 p-8 rounded-2xl hover:shadow-lg transition-all relative">
-              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+            <div className="border border-orange-600 bg-orange-50 p-8 rounded-2xl hover:shadow-lg transition-all relative">
+              <div className="absolute top-0 right-0 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
                 MOST POPULAR
               </div>
-              <h3 className="font-bold text-xl mb-4 text-blue-900">Pro</h3>
-              <div className="text-4xl font-bold mb-6 text-blue-900">
+              <h3 className="font-bold text-xl mb-4 text-orange-900">Pro</h3>
+              <div className="text-4xl font-bold mb-6 text-orange-900">
                 $59
-                <span className="text-sm text-blue-700 font-normal">/mo</span>
+                <span className="text-sm text-orange-700 font-normal">/mo</span>
               </div>
-              <ul className="text-left space-y-3 mb-8 text-blue-800">
+              <ul className="text-left space-y-3 mb-8 text-orange-800">
                 <li>• Access to ALL courses</li>
                 <li>• Certificate of completion</li>
                 <li>• 1-on-1 Mentorship</li>
                 <li>• Offline downloads</li>
               </ul>
-              <button className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+              <button className="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700">
                 Get Started
               </button>
             </div>
@@ -385,7 +385,7 @@ const ProfessionalHome = () => {
                 <li>• SSO Integration</li>
                 <li>• Dedicated account manager</li>
               </ul>
-              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
+              <button className="w-full py-3 border border-orange-600 text-orange-600 font-bold rounded-lg hover:bg-orange-50">
                 Contact Sales
               </button>
             </div>
@@ -396,7 +396,7 @@ const ProfessionalHome = () => {
       <section id="teams" className="py-20 bg-slate-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Upskill Your Entire Team</h2>
-          <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-orange-200 mb-10 max-w-2xl mx-auto">
             Join 500+ companies that use AcadLearn Pro to train their workforce.
           </p>
           <div className="flex flex-wrap justify-center gap-12 font-bold text-2xl text-slate-600 opacity-50">
@@ -435,17 +435,17 @@ const ProfessionalHome = () => {
               </h4>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <Link to="/about" className="hover:text-blue-600">
+                  <Link to="/about" className="hover:text-orange-600">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <a href="#" className="hover:text-orange-600">
                     Careers
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <a href="#" className="hover:text-orange-600">
                     Press
                   </a>
                 </li>
@@ -457,17 +457,17 @@ const ProfessionalHome = () => {
               </h4>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <a href="#" className="hover:text-orange-600">
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-600">
+                  <a href="#" className="hover:text-orange-600">
                     Help Center
                   </a>
                 </li>
                 <li>
-                  <Link to="/contact" className="hover:text-blue-600">
+                  <Link to="/contact" className="hover:text-orange-600">
                     Contact
                   </Link>
                 </li>
@@ -479,17 +479,17 @@ const ProfessionalHome = () => {
               </h4>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <Link to="/terms" className="hover:text-blue-600">
+                  <Link to="/terms" className="hover:text-orange-600">
                     Terms of Service
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="hover:text-blue-600">
+                  <Link to="/privacy" className="hover:text-orange-600">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="hover:text-blue-600">
+                  <Link to="/privacy" className="hover:text-orange-600">
                     Cookie Policy
                   </Link>
                 </li>
@@ -501,7 +501,7 @@ const ProfessionalHome = () => {
               © 2026 AcadLearn Pro. All rights reserved.
             </div>
             <div className="flex gap-4 text-gray-400">
-              <a href="#" className="hover:text-blue-600">
+              <a href="#" className="hover:text-orange-600">
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
@@ -510,7 +510,7 @@ const ProfessionalHome = () => {
                   <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
                 </svg>
               </a>
-              <a href="#" className="hover:text-blue-600">
+              <a href="#" className="hover:text-orange-600">
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
@@ -585,7 +585,7 @@ const ProCourseCard = ({
         </div>
         <button
           onClick={onEnroll || (() => {})}
-          className="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700 transition-colors"
+          className="px-5 py-2 bg-orange-600 text-white text-sm font-bold rounded hover:bg-orange-700 transition-colors"
         >
           Enroll Now
         </button>

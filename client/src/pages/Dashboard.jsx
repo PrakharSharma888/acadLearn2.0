@@ -10,7 +10,7 @@ const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", { day: "numeric",
 
 const STATUS_STYLES = {
   pending:   "bg-amber-100 text-amber-700",
-  confirmed: "bg-blue-100 text-blue-700",
+  confirmed: "bg-orange-100 text-orange-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-600",
 };
@@ -35,9 +35,9 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
   const upcoming = active.slice(0, 3);
 
   const stats = [
-    { label: "Available Classes", value: classes.length, color: "text-indigo-600", bg: "bg-indigo-50",
+    { label: "Available Classes", value: classes.length, color: "text-orange-600", bg: "bg-orange-50",
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> },
-    { label: "Demo Bookings", value: bookings.length, color: "text-violet-600", bg: "bg-violet-50",
+    { label: "Demo Bookings", value: bookings.length, color: "text-amber-600", bg: "bg-amber-50",
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> },
     { label: "Active Bookings", value: active.length, color: "text-emerald-600", bg: "bg-emerald-50",
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> },
@@ -46,11 +46,11 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
   return (
     <div className="space-y-8">
       {/* Welcome banner */}
-      <div className="bg-linear-to-r from-indigo-600 to-violet-600 rounded-2xl px-7 py-6 flex items-center justify-between shadow-md">
+      <div className="bg-linear-to-r from-orange-500 to-amber-500 rounded-2xl px-7 py-6 flex items-center justify-between shadow-md">
         <div>
-          <p className="text-indigo-200 text-sm font-medium mb-1">Good to see you 👋</p>
+          <p className="text-orange-100 text-sm font-medium mb-1">Good to see you 👋</p>
           <h1 className="text-2xl font-bold text-white">Welcome, {user.name}!</h1>
-          <p className="text-indigo-200 text-sm mt-1">Ready to explore your learning journey?</p>
+          <p className="text-orange-100 text-sm mt-1">Ready to explore your learning journey?</p>
         </div>
         <div className="hidden sm:flex w-14 h-14 bg-white/20 rounded-full items-center justify-center text-white font-bold text-2xl">
           {user.name?.charAt(0).toUpperCase()}
@@ -74,18 +74,18 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-base font-bold text-slate-800">Upcoming Demos</h2>
-          <button onClick={() => onNav("bookings")} className="text-xs font-semibold text-indigo-600 hover:underline">View all</button>
+          <button onClick={() => onNav("bookings")} className="text-xs font-semibold text-orange-600 hover:underline">View all</button>
         </div>
         {upcoming.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-400 text-sm">No upcoming demos.</p>
-            <button onClick={() => onNav("classes")} className="mt-3 text-sm font-semibold text-indigo-600 hover:underline">Browse classes →</button>
+            <button onClick={() => onNav("classes")} className="mt-3 text-sm font-semibold text-orange-600 hover:underline">Browse classes →</button>
           </div>
         ) : (
           <div className="space-y-3">
             {upcoming.map((b) => (
               <div key={b._id} className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
+                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -102,14 +102,14 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-4">
         <button onClick={() => onNav("classes")} className="bg-white border border-gray-100 rounded-2xl p-5 text-left shadow-sm hover:shadow-md transition-shadow group">
-          <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 mb-3 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+          <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"/></svg>
           </div>
           <p className="text-sm font-bold text-slate-700">Explore Classes</p>
           <p className="text-xs text-gray-400 mt-0.5">Browse & book demos</p>
         </button>
         <button onClick={() => onNav("bookings")} className="bg-white border border-gray-100 rounded-2xl p-5 text-left shadow-sm hover:shadow-md transition-shadow group">
-          <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600 mb-3 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+          <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 mb-3 group-hover:bg-amber-600 group-hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </div>
           <p className="text-sm font-bold text-slate-700">My Bookings</p>
@@ -136,7 +136,7 @@ const ClassesTab = ({ classes, loading, error, activeCategory, setActiveCategory
         <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
           {categories.map((cat) => (
             <button key={cat.key} onClick={() => setActiveCategory(cat.key)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${activeCategory === cat.key ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-slate-700"}`}>
+              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${activeCategory === cat.key ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-slate-700"}`}>
               {cat.label}
             </button>
           ))}
@@ -182,18 +182,21 @@ const ClassesTab = ({ classes, loading, error, activeCategory, setActiveCategory
 // ═════════════════════════════════════════════════════════════════════════════
 //  TAB: Bookings
 // ═════════════════════════════════════════════════════════════════════════════
-const BookingsTab = ({ bookings, loading, onCancel }) => {
+const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate }) => {
   const [filter, setFilter] = useState("all");
   const shown = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+  const isAdmin = user?.role === "admin";
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <h2 className="text-lg font-bold text-slate-800">My Demo Bookings</h2>
+        <h2 className="text-lg font-bold text-slate-800">
+          {isAdmin ? "All Demo Bookings (Admin)" : "My Demo Bookings"}
+        </h2>
         <div className="flex bg-gray-100 rounded-xl p-1 gap-1 flex-wrap">
           {["all", "pending", "confirmed", "completed", "cancelled"].map((s) => (
             <button key={s} onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${filter === s ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-slate-700"}`}>
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${filter === s ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-slate-700"}`}>
               {s}
             </button>
           ))}
@@ -208,8 +211,8 @@ const BookingsTab = ({ bookings, loading, onCancel }) => {
 
       {!loading && shown.length === 0 && (
         <div className="bg-white border border-gray-100 rounded-2xl p-14 text-center shadow-sm">
-          <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </div>
           <p className="text-gray-400 text-sm">No bookings found.</p>
         </div>
@@ -218,26 +221,46 @@ const BookingsTab = ({ bookings, loading, onCancel }) => {
       {!loading && shown.length > 0 && (
         <div className="space-y-3">
           {shown.map((b) => (
-            <div key={b._id} className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 shadow-sm">
-              <div className="w-11 h-11 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-800">{b.className || "Demo Class"}</p>
-                <p className="text-xs text-gray-500 mt-0.5">Student: <span className="font-medium text-slate-600">{b.studentName}</span> · Grade {b.grade}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Booked on {fmtDate(b.createdAt)}
-                  {b.preferredDate ? ` · Preferred: ${fmtDate(b.preferredDate)}` : ""}
-                </p>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <span className={`text-[11px] font-bold px-3 py-1 rounded-full uppercase ${STATUS_STYLES[b.status]}`}>{b.status}</span>
-                {(b.status === "pending" || b.status === "confirmed") && (
-                  <button onClick={() => onCancel(b._id)}
-                    className="text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-red-200">
-                    Cancel
-                  </button>
-                )}
+            <div key={b._id} className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-800">{b.className || "Demo Class"}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Student: <span className="font-medium text-slate-600">{b.studentName}</span> · Grade {b.grade}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Booked on {fmtDate(b.createdAt)}
+                    {b.preferredDate ? ` · Preferred: ${fmtDate(b.preferredDate)}` : ""}
+                  </p>
+                  {isAdmin && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      📧 {b.email} · 📞 {b.phone || "N/A"} · Parent: {b.parentName}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                  {isAdmin ? (
+                    <select 
+                      value={b.status} 
+                      onChange={(e) => onStatusUpdate(b._id, e.target.value)}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-slate-700 hover:border-orange-300 transition-colors"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  ) : (
+                    <span className={`text-[11px] font-bold px-3 py-1 rounded-full uppercase ${STATUS_STYLES[b.status]}`}>{b.status}</span>
+                  )}
+                  {!isAdmin && (b.status === "pending" || b.status === "confirmed") && (
+                    <button onClick={() => onCancel(b._id)}
+                      className="text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-red-200">
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -269,10 +292,10 @@ const ProgressTab = ({ bookings, classes }) => {
       {/* Overview cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Bookings",    value: totalDemos,       color: "text-indigo-600", bg: "bg-indigo-50" },
+          { label: "Total Bookings",    value: totalDemos,       color: "text-orange-600", bg: "bg-orange-50" },
           { label: "Demos Completed",   value: completed,        color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Active Bookings",   value: bookings.filter(b => b.status === "pending" || b.status === "confirmed").length, color: "text-amber-600", bg: "bg-amber-50" },
-          { label: "Classes Available", value: classes.length,   color: "text-violet-600", bg: "bg-violet-50" },
+          { label: "Classes Available", value: classes.length,   color: "text-orange-600", bg: "bg-orange-50" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
             <div className={`text-3xl font-bold ${s.color} mb-1`}>{s.value}</div>
@@ -285,10 +308,10 @@ const ProgressTab = ({ bookings, classes }) => {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-slate-700">Demo Completion Rate</h3>
-          <span className="text-sm font-bold text-indigo-600">{pct}%</span>
+          <span className="text-sm font-bold text-orange-600">{pct}%</span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-3">
-          <div className="bg-indigo-600 h-3 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+          <div className="bg-orange-600 h-3 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
         </div>
         <p className="text-xs text-gray-400 mt-2">{completed} of {totalDemos} demos completed</p>
       </div>
@@ -312,8 +335,8 @@ const ProgressTab = ({ bookings, classes }) => {
       </div>
 
       {/* Motivational quote */}
-      <div className="bg-linear-to-br from-indigo-600 to-violet-600 rounded-2xl p-6 text-white shadow-md">
-        <p className="italic text-indigo-100 text-sm leading-relaxed mb-3">
+      <div className="bg-linear-to-br from-orange-600 to-amber-600 rounded-2xl p-6 text-white shadow-md">
+        <p className="italic text-orange-100 text-sm leading-relaxed mb-3">
           "The beautiful thing about learning is that no one can take it away from you."
         </p>
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-70">
@@ -399,7 +422,7 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
     }
   };
 
-  const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition";
+  const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition";
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -407,13 +430,13 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
 
       {/* Avatar card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
-        <div className="w-16 h-16 bg-linear-to-tr from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
+        <div className="w-16 h-16 bg-linear-to-tr from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
           {user.name?.charAt(0).toUpperCase()}
         </div>
         <div>
           <p className="text-base font-bold text-slate-800">{user.name}</p>
           <p className="text-sm text-gray-500">{user.email}</p>
-          <span className="inline-block mt-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 capitalize">{user.role || "student"}</span>
+          <span className="inline-block mt-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 capitalize">{user.role || "student"}</span>
         </div>
       </div>
 
@@ -431,7 +454,7 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
           </div>
           {editMsg.text && <p className={`text-xs rounded-xl px-4 py-3 ${msgClass(editMsg.type)}`}>{editMsg.text}</p>}
           <button type="submit" disabled={editLoading}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors">
+            className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors">
             {editLoading ? "Saving..." : "Save Changes"}
           </button>
         </form>
@@ -454,7 +477,7 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
           ))}
           {pwdMsg.text && <p className={`text-xs rounded-xl px-4 py-3 ${msgClass(pwdMsg.type)}`}>{pwdMsg.text}</p>}
           <button type="submit" disabled={pwdLoading}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors">
+            className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors">
             {pwdLoading ? "Updating..." : "Update Password"}
           </button>
         </form>
@@ -555,6 +578,21 @@ const Dashboard = () => {
     }
   };
 
+  // ── Update booking status (Admin) ──
+  const handleStatusUpdate = async (id, newStatus) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/demo-booking/${id}/status`, {
+        method: "PUT",
+        headers: authHeader(user.token),
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error();
+      await loadBookings();
+    } catch {
+      alert("Could not update booking status. Please try again.");
+    }
+  };
+
   const handleLogout = () => { localStorage.removeItem("userInfo"); navigate("/login"); };
   const handleNav    = (key) => { setActiveNav(key); setSidebarOpen(false); };
 
@@ -563,13 +601,13 @@ const Dashboard = () => {
     <aside className="flex flex-col h-full bg-white border-r border-gray-100">
       <div className="px-6 py-5 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
             </svg>
           </div>
           <span className="text-lg font-bold text-slate-800 tracking-tight">
-            AcadLearn <span className="text-indigo-600 text-sm font-semibold">JR</span>
+            AcadLearn <span className="text-orange-600 text-sm font-semibold">JR</span>
           </span>
         </Link>
       </div>
@@ -578,11 +616,11 @@ const Dashboard = () => {
         {NAV_ITEMS.map((item) => (
           <button key={item.key} onClick={() => handleNav(item.key)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              activeNav === item.key ? "bg-indigo-50 text-indigo-600" : "text-gray-500 hover:bg-gray-50 hover:text-slate-700"}`}>
+              activeNav === item.key ? "bg-orange-50 text-orange-600" : "text-gray-500 hover:bg-gray-50 hover:text-slate-700"}`}>
             {item.icon}
             {item.label}
             {item.key === "bookings" && bookings.filter(b => b.status === "pending").length > 0 && (
-              <span className="ml-auto text-[10px] font-bold bg-indigo-600 text-white rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="ml-auto text-[10px] font-bold bg-orange-600 text-white rounded-full w-5 h-5 flex items-center justify-center">
                 {bookings.filter(b => b.status === "pending").length}
               </span>
             )}
@@ -593,7 +631,7 @@ const Dashboard = () => {
       {/* User card at bottom */}
       <div className="px-4 py-4 border-t border-gray-100">
         <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-          <div className="w-8 h-8 bg-linear-to-tr from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+          <div className="w-8 h-8 bg-linear-to-tr from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
             {user.name?.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -614,7 +652,7 @@ const Dashboard = () => {
     switch (activeNav) {
       case "dashboard": return <OverviewTab user={user} classes={classes} bookings={bookings} onNav={handleNav} />;
       case "classes":   return <ClassesTab classes={classes} loading={classesLoading} error={classesError} activeCategory={activeCategory} setActiveCategory={setActiveCategory} onBookDemo={setSelectedClass} />;
-      case "bookings":  return <BookingsTab bookings={bookings} loading={bookingsLoading} onCancel={handleCancel} />;
+      case "bookings":  return <BookingsTab bookings={bookings} loading={bookingsLoading} onCancel={handleCancel} user={user} onStatusUpdate={handleStatusUpdate} />;
       case "progress":  return <ProgressTab bookings={bookings} classes={classes} />;
       case "profile":   return <ProfileTab user={user} token={user.token} onUserUpdate={setUser} />;
       default:          return null;
@@ -653,7 +691,7 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-linear-to-tr from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white font-bold text-sm ring-2 ring-white shadow-sm">
+              <div className="w-9 h-9 bg-linear-to-tr from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm ring-2 ring-white shadow-sm">
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <span className="hidden sm:block text-sm font-semibold text-slate-700">{user.name}</span>
@@ -661,7 +699,7 @@ const Dashboard = () => {
             <button className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
               {bookings.filter(b => b.status === "pending").length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full" />
               )}
             </button>
             <button onClick={handleLogout} className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50">

@@ -54,14 +54,14 @@ const Signup = () => {
       <Navbar />
       <div className="min-h-screen flex items-center justify-center bg-gray-50 relative overflow-hidden">
         {/* Background decorations */}
-        <div className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="w-full max-w-md p-8 bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 relative z-10 my-10">
           <div className="text-center mb-8">
             <Link
               to="/"
-              className="text-3xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent inline-block mb-2"
+              className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent inline-block mb-2"
             >
               AcadLearn
             </Link>
@@ -82,7 +82,7 @@ const Signup = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 placeholder="John Doe"
               />
             </div>
@@ -96,7 +96,7 @@ const Signup = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -110,7 +110,7 @@ const Signup = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -124,14 +124,14 @@ const Signup = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-secondary text-white rounded-lg font-semibold hover:bg-emerald-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 mt-2"
+              className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 mt-2"
             >
               Create Account
             </button>
@@ -141,7 +141,7 @@ const Signup = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-secondary font-semibold hover:text-emerald-700"
+              className="text-orange-500 font-semibold hover:text-orange-600"
             >
               Sign In
             </Link>

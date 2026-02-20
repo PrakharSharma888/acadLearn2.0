@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand — Professional */
-  --color-primary: #4f46e5;       /* indigo-600  */
-  --color-secondary: #10b981;     /* emerald-500 */
-  /* Brand — Junior */
+  /* Brand — Now Orange/Amber for all */
+  --color-primary: #f59e0b;       /* amber-500   */
+  --color-secondary: #ea580c;     /* orange-600  */
+  /* Brand — Junior (same as primary now) */
   --color-junior: #f59e0b;        /* amber-500   */
   --color-junior-dark: #ea580c;   /* orange-600  */
   /* Neutral */

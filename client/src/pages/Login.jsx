@@ -34,14 +34,14 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-orange-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="w-full max-w-md p-8 bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 relative z-10">
         <div className="text-center mb-8">
           <Link
             to="/"
-            className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent inline-block mb-2"
+            className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent inline-block mb-2"
           >
             AcadLearn
           </Link>
@@ -61,7 +61,7 @@ const Login = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
               placeholder="you@example.com"
             />
           </div>
@@ -72,7 +72,7 @@ const Login = () => {
               </label>
               <a
                 href="#"
-                className="text-sm text-primary hover:text-indigo-700"
+                className="text-sm text-orange-500 hover:text-orange-600"
               >
                 Forgot password?
               </a>
@@ -82,13 +82,13 @@ const Login = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
               placeholder="••••••••"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-indigo-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             Sign In
           </button>
@@ -98,7 +98,7 @@ const Login = () => {
           Don't have an account?{" "}
           <Link
             to="/signup"
-            className="text-primary font-semibold hover:text-indigo-700"
+            className="text-orange-500 font-semibold hover:text-orange-600"
           >
             Create account
           </Link>

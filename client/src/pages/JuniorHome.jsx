@@ -328,14 +328,14 @@ const JuniorHome = () => {
             </div>
 
             {/* Track 3 */}
-            <div className="bg-blue-50 rounded-[2.5rem] p-8 border border-blue-100 relative overflow-hidden group hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 bg-blue-500 text-white font-black px-6 py-2 rounded-bl-2xl">
+            <div className="bg-orange-50 rounded-[2.5rem] p-8 border border-orange-100 relative overflow-hidden group hover:shadow-xl transition-all">
+              <div className="absolute top-0 right-0 bg-orange-500 text-white font-black px-6 py-2 rounded-bl-2xl">
                 Grades 7 - 10
               </div>
               <h3 className="text-2xl font-black text-slate-800 mb-2 mt-4">
                 Future Leaders
               </h3>
-              <div className="text-blue-600 font-bold mb-6 uppercase tracking-wider text-xs">
+              <div className="text-orange-600 font-bold mb-6 uppercase tracking-wider text-xs">
                 Problem Solvers
               </div>
               <p className="text-gray-600 mb-8 font-medium">
@@ -435,7 +435,7 @@ const JuniorHome = () => {
                 Made by Rahul (Grade 4) for his Mom
               </p>
               <div className="flex gap-2">
-                <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">
+                <span className="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full">
                   Coding
                 </span>
                 <span className="px-3 py-1 bg-purple-50 text-purple-600 text-xs font-bold rounded-full">
@@ -476,7 +476,7 @@ const JuniorHome = () => {
                 <span className="px-3 py-1 bg-green-50 text-green-600 text-xs font-bold rounded-full">
                   Math
                 </span>
-                <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
+                <span className="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full">
                   IQ
                 </span>
               </div>
