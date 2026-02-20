@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import BookDemoModal from "../components/BookDemoModal";
 import useDashboard from "../hooks/useDashboard";
 import { NAV_ITEMS } from "../dashboard/constants";
@@ -11,7 +12,8 @@ import ProfileTab     from "../dashboard/ProfileTab";
 import AdminTab       from "../dashboard/AdminTab";
 
 const Dashboard = () => {
-  const [activeNav,    setActiveNav]    = useState("dashboard");
+  const { tab } = useParams();
+  const navigate = useNavigate();
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
@@ -23,14 +25,18 @@ const Dashboard = () => {
     demoSessions,
   } = useDashboard();
 
-  const handleNav = (key) => {
-    setActiveNav(key);
+  const handleNav = (pathOrKey) => {
+    // If it's a key like "bookings", convert to path
+    const path = pathOrKey.startsWith("/") 
+      ? pathOrKey 
+      : `/dashboard/${pathOrKey}`;
+    navigate(path);
     setSidebarOpen(false);
   };
 
   const renderTab = () => {
-    switch (activeNav) {
-      case "dashboard":
+    switch (tab) {
+      case "overview":
         return <OverviewTab user={user} classes={classes} bookings={bookings} onNav={handleNav} />;
       case "classes":
         return (
@@ -62,17 +68,18 @@ const Dashboard = () => {
       case "admin":
         return <AdminTab token={user.token} />;
       default:
-        return null;
+        return <OverviewTab user={user} classes={classes} bookings={bookings} onNav={handleNav} />;
     }
   };
 
   const sidebarProps = {
     user,
-    activeNav,
+    activeTab: tab,
     bookings,
-    onNav: handleNav,
     onLogout: handleLogout,
   };
+
+  const currentNav = NAV_ITEMS.find((n) => n.key === tab) || NAV_ITEMS[0];
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -105,7 +112,7 @@ const Dashboard = () => {
           </button>
 
           <p className="hidden md:block text-sm font-semibold text-gray-400 capitalize">
-            {NAV_ITEMS.find((n) => n.key === activeNav)?.label}
+            {currentNav.label}
           </p>
 
           <div className="flex items-center gap-3">

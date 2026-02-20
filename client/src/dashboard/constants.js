@@ -21,10 +21,10 @@ export const STATUS_STYLES = {
 
 // ── Sidebar nav items (labels + keys only — icons live in DashboardSidebar) ──
 export const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard" },
-  { key: "classes",   label: "My Classes" },
-  { key: "bookings",  label: "Demo Bookings" },
-  { key: "progress",  label: "Progress" },
-  { key: "profile",   label: "Profile" },
-  { key: "admin",     label: "Admin Panel", adminOnly: true },
+  { key: "overview", label: "Dashboard", path: "/dashboard/overview" },
+  { key: "classes", label: "My Classes", path: "/dashboard/classes" },
+  { key: "bookings", label: "Demo Bookings", path: "/dashboard/bookings" },
+  { key: "progress", label: "Progress", path: "/dashboard/progress" },
+  { key: "profile", label: "Profile", path: "/dashboard/profile" },
+  { key: "admin", label: "Admin Panel", path: "/dashboard/admin", adminOnly: true },
 ];

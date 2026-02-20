@@ -8,12 +8,6 @@ const EMPTY_CLASS = {
   instructor: "AcadLearn Team", description: "", duration: "", badge: "", totalLessons: "",
 };
 
-// ── Demo session form defaults ────────────────────────────────────────────────
-const EMPTY_SESSION = {
-  title: "", classId: "", className: "", instructor: "AcadLearn Team",
-  description: "", date: "", time: "", category: "all", type: "free", price: "",
-};
-
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
@@ -39,9 +33,6 @@ const AdminTab = ({ token }) => {
   // ── Demo sessions ─────────────────────────────────────────────────────────
   const [sessions,        setSessions]        = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
-  const [sessionForm,     setSessionForm]     = useState(EMPTY_SESSION);
-  const [sessionSaving,   setSessionSaving]   = useState(false);
-  const [sessionMsg,      setSessionMsg]      = useState("");
 
   const loadSessions = useCallback(async () => {
     setLoadingSessions(true);
@@ -54,44 +45,6 @@ const AdminTab = ({ token }) => {
   }, [token]);
 
   useEffect(() => { loadSessions(); }, [loadSessions]);
-
-  const handleSessionChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "classId") {
-      const cls = allClasses.find((c) => c._id === value);
-      setSessionForm((f) => ({
-        ...f,
-        classId:  value,
-        className: cls ? cls.title : "",
-        category:  cls ? cls.category : "all",
-        title:     f.title || (cls ? cls.title : ""),
-      }));
-    } else {
-      setSessionForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
-  const handleSessionSubmit = async (e) => {
-    e.preventDefault();
-    setSessionSaving(true);
-    setSessionMsg("");
-    try {
-      const res = await fetch(`${API_BASE}/api/demo-sessions`, {
-        method: "POST",
-        headers: authHeader(token),
-        body: JSON.stringify(sessionForm),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        setSessionMsg(err.message || "Failed to schedule demo.");
-        return;
-      }
-      setSessionMsg("Demo session scheduled!");
-      setSessionForm(EMPTY_SESSION);
-      await loadSessions();
-    } catch { setSessionMsg("Server error. Please try again."); }
-    finally { setSessionSaving(false); }
-  };
 
   const handleDeleteSession = async (id) => {
     if (!window.confirm("Delete this demo session?")) return;
@@ -166,7 +119,6 @@ const AdminTab = ({ token }) => {
 
   const SECTIONS = [
     { key: "sessions", label: "Demo Sessions" },
-    { key: "schedule", label: "+ Schedule Demo" },
     { key: "classes",  label: "All Classes" },
     { key: "add",      label: "+ Add Class" },
   ];
@@ -178,7 +130,7 @@ const AdminTab = ({ token }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Admin Panel</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Manage demo sessions and classes</p>
+          <p className="text-sm text-gray-400 mt-0.5">View demo sessions and manage classes</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {SECTIONS.map((s) => (
@@ -201,10 +153,21 @@ const AdminTab = ({ token }) => {
       {section === "sessions" && (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-slate-700">
-              Scheduled Demo Sessions{" "}
-              <span className="text-gray-400 font-normal text-sm">({sessions.length})</span>
-            </h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-semibold text-slate-700">
+                  Scheduled Demo Sessions{" "}
+                  <span className="text-gray-400 font-normal text-sm">({sessions.length})</span>
+                </h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  To schedule new demo sessions, go to the{" "}
+                  <a href="/dashboard/bookings" className="text-orange-600 hover:underline font-medium">
+                    Demo Bookings
+                  </a>
+                  {" "}tab
+                </p>
+              </div>
+            </div>
           </div>
           {loadingSessions ? (
             <div className="px-6 py-12 text-center text-gray-400 text-sm">Loading…</div>
@@ -282,147 +245,6 @@ const AdminTab = ({ token }) => {
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* ── Schedule Demo form ── */}
-      {section === "schedule" && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="font-semibold text-slate-700 mb-6">Schedule a Demo Session</h2>
-          <form onSubmit={handleSessionSubmit} className="space-y-5">
-
-            {/* Link to class (optional) */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Link to Class (optional)</label>
-              <select
-                name="classId"
-                value={sessionForm.classId}
-                onChange={handleSessionChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              >
-                <option value="">— Select a class (optional) —</option>
-                {allClasses.map((c) => (
-                  <option key={c._id} value={c._id}>{c.title} ({c.category})</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Title + category + type */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Session Title <span className="text-red-400">*</span>
-                </label>
-                <input
-                  name="title" value={sessionForm.title} onChange={handleSessionChange}
-                  required placeholder="e.g. Free Maths Demo – Grade 5"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Category</label>
-                <select
-                  name="category" value={sessionForm.category} onChange={handleSessionChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                >
-                  <option value="all">All Students</option>
-                  <option value="junior">Junior</option>
-                  <option value="professional">Professional</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Type <span className="text-red-400">*</span>
-                </label>
-                <select
-                  name="type" value={sessionForm.type} onChange={handleSessionChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                >
-                  <option value="free">Free Demo</option>
-                  <option value="paid">Paid Demo</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Price (conditional - only for paid demos) */}
-            {sessionForm.type === "paid" && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Price (₹) <span className="text-red-400">*</span>
-                </label>
-                <input
-                  name="price" type="number" min="0" step="1"
-                  value={sessionForm.price} onChange={handleSessionChange}
-                  required={sessionForm.type === "paid"}
-                  placeholder="e.g. 500"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                />
-              </div>
-            )}
-
-            {/* Date + Time + Instructor */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Date <span className="text-red-400">*</span>
-                </label>
-                <input
-                  name="date" type="date" value={sessionForm.date} onChange={handleSessionChange}
-                  required min={new Date().toISOString().split("T")[0]}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Time <span className="text-red-400">*</span>
-                </label>
-                <input
-                  name="time" type="time" value={sessionForm.time} onChange={handleSessionChange}
-                  required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Instructor</label>
-                <input
-                  name="instructor" value={sessionForm.instructor} onChange={handleSessionChange}
-                  placeholder="AcadLearn Team"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                />
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Description</label>
-              <textarea
-                name="description" value={sessionForm.description} onChange={handleSessionChange}
-                rows={3} placeholder="What will students learn in this demo?"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
-              />
-            </div>
-
-            <div className="flex items-center gap-3 pt-1">
-              <button
-                type="submit" disabled={sessionSaving}
-                className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
-              >
-                {sessionSaving ? "Scheduling…" : "Schedule Demo"}
-              </button>
-              <button
-                type="button"
-                onClick={() => { setSessionForm(EMPTY_SESSION); setSessionMsg(""); }}
-                className="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Reset
-              </button>
-              {sessionMsg && (
-                <p className={`text-sm font-medium ${sessionMsg.includes("scheduled") ? "text-green-600" : "text-red-500"}`}>
-                  {sessionMsg}
-                </p>
-              )}
-            </div>
-          </form>
         </div>
       )}
 

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { fmtDate, STATUS_STYLES } from "./constants";
+import { useState, useEffect, useCallback } from "react";
+import { fmtDate, STATUS_STYLES, authHeader } from "./constants";
+import API_BASE from "../config/api";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-gray-200 rounded-xl ${className}`} />
@@ -144,12 +145,83 @@ const ActionModal = ({ booking, onClose, onSave }) => {
 const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSessions = [], onBookDemo }) => {
   const [filter,         setFilter]         = useState("all");
   const [activeBooking,  setActiveBooking]  = useState(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   const shown   = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
   const isAdmin = user?.role === "admin";
 
   // All upcoming sessions (today or future), sorted soonest first
   const upcomingSessions = demoSessions.filter((s) => daysUntil(s.date) >= 0);
+
+  // ── Schedule Demo Form State (Admin only) ────────────────────────────────────
+  const EMPTY_SESSION = {
+    title: "", classId: "", className: "", instructor: "AcadLearn Team",
+    description: "", date: "", time: "", category: "all", type: "free", price: "",
+  };
+  
+  const [allClasses,    setAllClasses]    = useState([]);
+  const [sessionForm,   setSessionForm]   = useState(EMPTY_SESSION);
+  const [sessionSaving, setSessionSaving] = useState(false);
+  const [sessionMsg,    setSessionMsg]    = useState("");
+
+  // Load all classes for the schedule form dropdown
+  const loadAllClasses = useCallback(async () => {
+    if (!user?.token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/classes`, { headers: authHeader(user.token) });
+      if (!res.ok) throw new Error();
+      setAllClasses(await res.json());
+    } catch { setAllClasses([]); }
+  }, [user?.token]);
+
+  useEffect(() => {
+    if (isAdmin) loadAllClasses();
+  }, [isAdmin, loadAllClasses]);
+
+  const handleSessionChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "classId") {
+      const cls = allClasses.find((c) => c._id === value);
+      setSessionForm((f) => ({
+        ...f,
+        classId:  value,
+        className: cls ? cls.title : "",
+        category:  cls ? cls.category : "all",
+        title:     f.title || (cls ? cls.title : ""),
+      }));
+    } else {
+      setSessionForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+
+  const handleSessionSubmit = async (e) => {
+    e.preventDefault();
+    setSessionSaving(true);
+    setSessionMsg("");
+    try {
+      // Prepare data with price as number
+      const sessionData = {
+        ...sessionForm,
+        price: sessionForm.type === "paid" ? Number(sessionForm.price) || 0 : 0,
+      };
+      
+      const res = await fetch(`${API_BASE}/api/demo-sessions`, {
+        method: "POST",
+        headers: authHeader(user.token),
+        body: JSON.stringify(sessionData),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        setSessionMsg(err.message || "Failed to schedule demo.");
+        return;
+      }
+      setSessionMsg("Demo session scheduled successfully!");
+      setSessionForm(EMPTY_SESSION);
+      // Refresh by notifying parent or reloading page
+      setTimeout(() => window.location.reload(), 1500);
+    } catch { setSessionMsg("Server error. Please try again."); }
+    finally { setSessionSaving(false); }
+  };
 
   return (
     <div>
@@ -237,6 +309,190 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Schedule Demo Button (Admin only) ── */}
+      {isAdmin && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowScheduleModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-colors shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Schedule New Demo Session
+          </button>
+        </div>
+      )}
+
+      {/* ── Schedule Demo Modal (Admin only) ── */}
+      {showScheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowScheduleModal(false)} />
+
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-amber-400 p-6 text-white z-10">
+              <button
+                onClick={() => setShowScheduleModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h2 className="text-xl font-bold">Schedule New Demo Session</h2>
+              <p className="text-orange-100 text-sm mt-1">Create a demo session for students to book</p>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSessionSubmit} className="p-6 space-y-5">(
+            <form onSubmit={handleSessionSubmit} className="p-6 space-y-5">
+              {/* Link to class (optional) */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Link to Class (optional)</label>
+                <select
+                  name="classId"
+                  value={sessionForm.classId}
+                  onChange={handleSessionChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                >
+                  <option value="">— Select a class (optional) —</option>
+                  {allClasses.map((c) => (
+                    <option key={c._id} value={c._id}>{c.title} ({c.category})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Title + category + type */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Session Title <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="title" value={sessionForm.title} onChange={handleSessionChange}
+                    required placeholder="e.g. Free Maths Demo – Grade 5"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Category</label>
+                  <select
+                    name="category" value={sessionForm.category} onChange={handleSessionChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  >
+                    <option value="all">All Students</option>
+                    <option value="junior">Junior</option>
+                    <option value="professional">Professional</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Type <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    name="type" value={sessionForm.type} onChange={handleSessionChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  >
+                    <option value="free">Free Demo</option>
+                    <option value="paid">Paid Demo</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Price (conditional - only for paid demos) */}
+              {sessionForm.type === "paid" && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Price (₹) <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="price" type="number" min="0" step="1"
+                    value={sessionForm.price} onChange={handleSessionChange}
+                    required={sessionForm.type === "paid"}
+                    placeholder="e.g. 500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+              )}
+
+              {/* Date + Time + Instructor */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Date <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="date" type="date" value={sessionForm.date} onChange={handleSessionChange}
+                    required min={new Date().toISOString().split("T")[0]}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Time <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="time" type="time" value={sessionForm.time} onChange={handleSessionChange}
+                    required
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Instructor</label>
+                  <input
+                    name="instructor" value={sessionForm.instructor} onChange={handleSessionChange}
+                    placeholder="AcadLearn Team"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Description</label>
+                <textarea
+                  name="description" value={sessionForm.description} onChange={handleSessionChange}
+                  rows={3} placeholder="What will students learn in this demo?"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="submit" disabled={sessionSaving}
+                    className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
+                  >
+                    {sessionSaving ? "Scheduling…" : "Schedule Demo"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSessionForm(EMPTY_SESSION); setSessionMsg(""); }}
+                    className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowScheduleModal(false); setSessionForm(EMPTY_SESSION); setSessionMsg(""); }}
+                    className="px-4 py-2.5 border border-gray-300 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {sessionMsg && (
+                  <span className={`text-xs font-semibold ${sessionMsg.includes("success") ? "text-green-600" : "text-red-500"}`}>
+                    {sessionMsg}
+                  </span>
+                )}
+              </div>
+            </form>
           </div>
         </div>
       )}
