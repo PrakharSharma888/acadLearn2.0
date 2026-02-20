@@ -40,6 +40,16 @@ const useDashboard = () => {
     fetchClasses();
   }, [activeCategory]);
 
+  // ── Demo Sessions (public, upcoming) ─────────────────────────────────────
+  const [demoSessions, setDemoSessions] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/demo-sessions`)
+      .then((r) => r.ok ? r.json() : [])
+      .then(setDemoSessions)
+      .catch(() => setDemoSessions([]));
+  }, []);
+
   // ── Bookings ──────────────────────────────────────────────────────────────
   const [bookings, setBookings]               = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(true);
@@ -123,6 +133,8 @@ const useDashboard = () => {
     loadBookings,
     handleCancel,
     handleStatusUpdate,
+    // demo sessions
+    demoSessions,
   };
 };
 

@@ -164,9 +164,27 @@ const BookDemoModal = ({ cls, user, onClose }) => {
           <h2 className="text-xl font-bold leading-tight">
             {cls?.title || "Book a Demo Class"}
           </h2>
-          {cls?.instructor && (
-            <p className={`${theme.subtext} text-sm mt-1`}>By {cls.instructor}</p>
-          )}
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            {cls?.instructor && (
+              <p className={`${theme.subtext} text-sm`}>By {cls.instructor}</p>
+            )}
+            {cls?.type === "paid" && cls?.price > 0 && (
+              <span className="inline-flex items-center gap-1.5 bg-white/20 text-white text-sm font-bold px-3 py-1 rounded-full">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                ₹{cls.price}
+              </span>
+            )}
+            {cls?.type === "free" && (
+              <span className="inline-flex items-center gap-1 bg-green-500/90 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                FREE
+              </span>
+            )}
+          </div>
         </div>
 
         {/* ── Success state ── */}
@@ -180,7 +198,10 @@ const BookDemoModal = ({ cls, user, onClose }) => {
             <h3 className="text-xl font-bold text-slate-800 mb-2">Demo Booked!</h3>
             <p className="text-gray-500 text-sm mb-6">
               A confirmation email has been sent to <strong>{formData.email}</strong>.
-              Our team will call you within 24 hours.
+              {cls?.type === "paid" 
+                ? " Our team will contact you within 24 hours with payment details and session confirmation."
+                : " Our team will call you within 24 hours."
+              }
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {/* Book another demo for a different class */}
@@ -201,6 +222,25 @@ const BookDemoModal = ({ cls, user, onClose }) => {
         ) : (
           /* ── Form ── */
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {/* Payment notice for paid demos */}
+            {cls?.type === "paid" && cls?.price > 0 && (
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-purple-900 mb-1">Paid Demo Session</p>
+                    <p className="text-xs text-purple-700">
+                      This is a paid demo session costing <span className="font-bold">₹{cls.price}</span>. After booking, our team will contact you with payment details and session confirmation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {FIELDS.map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">
@@ -244,7 +284,7 @@ const BookDemoModal = ({ cls, user, onClose }) => {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
-                  Confirm Demo Booking
+                  {cls?.type === "paid" ? "Request Paid Demo" : "Confirm Demo Booking"}
                 </>
               )}
             </button>

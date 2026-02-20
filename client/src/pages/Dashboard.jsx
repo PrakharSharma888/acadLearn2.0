@@ -20,6 +20,7 @@ const Dashboard = () => {
     classes, classesLoading, classesError, activeCategory, setActiveCategory,
     bookings, bookingsLoading, loadBookings,
     handleCancel, handleStatusUpdate,
+    demoSessions,
   } = useDashboard();
 
   const handleNav = (key) => {
@@ -50,6 +51,8 @@ const Dashboard = () => {
             onCancel={handleCancel}
             user={user}
             onStatusUpdate={handleStatusUpdate}
+            demoSessions={demoSessions}
+            onBookDemo={setSelectedClass}
           />
         );
       case "progress":

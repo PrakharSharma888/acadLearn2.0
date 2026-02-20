@@ -69,10 +69,10 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
         ))}
       </div>
 
-      {/* Upcoming demos */}
+      {/* My upcoming bookings */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold text-slate-800">Upcoming Demos</h2>
+          <h2 className="text-base font-bold text-slate-800">My Demo Bookings</h2>
           <button onClick={() => onNav("bookings")} className="text-xs font-semibold text-orange-600 hover:underline">
             View all
           </button>
@@ -95,7 +95,12 @@ const OverviewTab = ({ user, classes, bookings, onNav }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-700 truncate">{b.className || "Demo Class"}</p>
-                  <p className="text-xs text-gray-400">{b.studentName} · {fmtDate(b.createdAt)}</p>
+                  <p className="text-xs text-gray-400">
+                    {b.studentName}
+                    {b.confirmedDate
+                      ? ` · ${fmtDate(b.confirmedDate)}${b.confirmedTime ? ` at ${b.confirmedTime}` : ""}`
+                      : ` · ${fmtDate(b.createdAt)}`}
+                  </p>
                 </div>
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${STATUS_STYLES[b.status]}`}>
                   {b.status}
