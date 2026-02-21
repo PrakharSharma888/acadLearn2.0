@@ -123,6 +123,7 @@ const useDashboard = () => {
     handleLogout,
     // classes
     classes,
+    setClasses,
     classesLoading,
     classesError,
     activeCategory,

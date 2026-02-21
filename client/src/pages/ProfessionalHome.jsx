@@ -269,7 +269,7 @@ const ProfessionalHome = () => {
               category="Data Science"
               title="Advanced Data Analytics with Python"
               desc="Master Python libraries like Pandas and NumPy to analyze complex datasets."
-              price="$89.99"
+              price="₹70,499"
               rating="4.8"
               tags={["Python", "Pandas", "Visualization"]}
               imageColor="bg-sky-700"
@@ -282,7 +282,7 @@ const ProfessionalHome = () => {
               category="Product Mgmt"
               title="Product Strategy for Senior Managers"
               desc="Learn to build roadmaps, manage stakeholders, and lead product teams."
-              price="$129.99"
+              price="₹90,999"
               rating="4.9"
               tags={["Strategy", "Agile", "Leadership"]}
               imageColor="bg-orange-800"
@@ -292,7 +292,7 @@ const ProfessionalHome = () => {
               category="Engineering"
               title="Full-Stack Web Development Bootcamp"
               desc="Become a full-stack developer with React, Node.js, and modern tools."
-              price="$149.99"
+              price="₹52,499"
               rating="4.7"
               tags={["React", "Node.js", "MongoDB"]}
               imageColor="bg-slate-800"
@@ -302,7 +302,7 @@ const ProfessionalHome = () => {
               category="Marketing"
               title="Digital Marketing & SEO Mastery"
               desc="Drive traffic and sales with comprehensive SEO, social media strategies."
-              price="$79.99"
+              price="₹60,699"
               rating="4.6"
               tags={["SEO", "Ads", "Analytics"]}
               imageColor="bg-emerald-700"
@@ -312,7 +312,7 @@ const ProfessionalHome = () => {
               category="Leadership"
               title="Effective Leadership & Communication"
               desc="Develop the soft skills needed to lead teams, resolve conflicts, and inspire."
-              price="$99.99"
+              price="₹80,299"
               rating="4.9"
               tags={["Mgmt", "Soft Skills", "Public Speaking"]}
               imageColor="bg-neutral-800"
@@ -322,7 +322,7 @@ const ProfessionalHome = () => {
               category="Design"
               title="UI/UX Design Fundamentals"
               desc="Create intuitive and beautiful user interfaces. Learn Figma, wireframing."
-              price="$109.99"
+              price="₹92,199"
               rating="4.7"
               tags={["Figma", "Prototyping", "User Research"]}
               imageColor="bg-pink-800"
@@ -342,7 +342,7 @@ const ProfessionalHome = () => {
             <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
               <h3 className="font-bold text-xl mb-4">Basic</h3>
               <div className="text-4xl font-bold mb-6">
-                $29
+                ₹20,499
                 <span className="text-sm text-gray-500 font-normal">/mo</span>
               </div>
               <ul className="text-left space-y-3 mb-8 text-gray-600">
@@ -360,7 +360,7 @@ const ProfessionalHome = () => {
               </div>
               <h3 className="font-bold text-xl mb-4 text-blue-900">Pro</h3>
               <div className="text-4xl font-bold mb-6 text-blue-900">
-                $59
+                ₹40,999
                 <span className="text-sm text-blue-700 font-normal">/mo</span>
               </div>
               <ul className="text-left space-y-3 mb-8 text-blue-800">
@@ -376,7 +376,7 @@ const ProfessionalHome = () => {
             <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
               <h3 className="font-bold text-xl mb-4">Team</h3>
               <div className="text-4xl font-bold mb-6">
-                $99
+                ₹80,299
                 <span className="text-sm text-gray-500 font-normal">/user</span>
               </div>
               <ul className="text-left space-y-3 mb-8 text-gray-600">

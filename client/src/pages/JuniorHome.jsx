@@ -165,7 +165,7 @@ const JuniorHome = () => {
               </p>
               <ul className="space-y-1 text-sm text-gray-700 mb-4">
                 <li>
-                  <span className="font-semibold">Grades:</span> 3rd to 8th
+                  <span className="font-semibold">Grades:</span> 1st to 9th
                 </li>
                 <li>
                   <span className="font-semibold">Duration:</span> 6 Days
@@ -212,7 +212,7 @@ const JuniorHome = () => {
               </p>
               <ul className="space-y-1 text-sm text-gray-700 mb-4">
                 <li>
-                  <span className="font-semibold">Grades:</span> 1st to 8th
+                  <span className="font-semibold">Grades:</span> 1st to 9th
                 </li>
                 <li>
                   <span className="font-semibold">Duration:</span> 6 Days
@@ -253,7 +253,7 @@ const JuniorHome = () => {
               </p>
               <ul className="space-y-1 text-sm text-gray-700 mb-4">
                 <li>
-                  <span className="font-semibold">Grades:</span> 1st to 8th
+                  <span className="font-semibold">Grades:</span> 1st to 9th
                 </li>
                 <li>
                   <span className="font-semibold">Duration:</span> 6 Days

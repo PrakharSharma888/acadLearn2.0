@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ── Theme by category ─────────────────────────────────────────────────────────
 const THEME = {
@@ -43,6 +44,7 @@ const ChevronIcon = ({ open }) => (
 
 const ClassCard = ({ cls, onBookDemo }) => {
   const [curriculumOpen, setCurriculumOpen] = useState(false);
+  const navigate = useNavigate();
 
   const t = THEME[cls.category] || THEME.professional;
 
@@ -64,36 +66,90 @@ const ClassCard = ({ cls, onBookDemo }) => {
         )}
       </div>
 
-      {/* Curriculum accordion */}
-      {cls.curriculum && cls.curriculum.length > 0 && (
+      {/* Curriculum accordion — subjects → lessons (falls back to flat curriculum) */}
+      {(cls.subjects?.length > 0 || cls.curriculum?.length > 0) && (
         <div className="mx-5 mb-3 border border-gray-100 rounded-xl overflow-hidden">
           <button
             onClick={() => setCurriculumOpen((o) => !o)}
             className={`w-full flex justify-between items-center px-3 py-2.5 text-xs font-semibold text-slate-600 ${t.currBg} transition-colors`}
           >
-            <span>Curriculum ({cls.curriculum.length} topics)</span>
+            {cls.subjects?.length > 0 ? (
+              <span>
+                {cls.subjects.length} subject{cls.subjects.length !== 1 ? "s" : ""} ·{" "}
+                {cls.subjects.reduce((n, s) => n + (s.lessons?.length || 0), 0)} lessons
+              </span>
+            ) : (
+              <span>Curriculum ({cls.curriculum.length} topics)</span>
+            )}
             <ChevronIcon open={curriculumOpen} />
           </button>
+
           {curriculumOpen && (
-            <ul className="divide-y divide-gray-50 bg-white max-h-48 overflow-y-auto">
-              {cls.curriculum.map((lesson, i) => (
-                <li key={i} className="flex items-start gap-2 px-3 py-2.5">
-                  <span className={`mt-0.5 w-4 h-4 rounded-full ${t.currNum} text-[9px] font-bold flex items-center justify-center shrink-0`}>
-                    {i + 1}
-                  </span>
-                  <p className="text-xs text-slate-600 leading-snug">{lesson.title}</p>
-                </li>
-              ))}
-            </ul>
+            <div className="bg-white max-h-52 overflow-y-auto">
+              {cls.subjects?.length > 0 ? (
+                cls.subjects.map((subject, si) => (
+                  <div key={si}>
+                    {/* Subject heading */}
+                    <div className={`flex items-center gap-2 px-3 py-2 ${t.currBg} border-t border-gray-50`}>
+                      <span className={`w-4 h-4 rounded-full ${t.currNum} text-[8px] font-bold flex items-center justify-center shrink-0`}>
+                        {si + 1}
+                      </span>
+                      <p className="text-[10px] font-bold text-slate-700 leading-snug">{subject.title}</p>
+                    </div>
+                    {/* Lessons */}
+                    {subject.lessons?.map((lesson, li) => (
+                      <div key={li} className="flex items-start gap-2 px-3 py-2 pl-8 border-t border-gray-50">
+                        <span className="text-[9px] text-gray-400 font-semibold shrink-0 mt-0.5">{li + 1}.</span>
+                        <p className="text-xs text-slate-500 leading-snug">{lesson.title}</p>
+                        {lesson.duration && (
+                          <span className="ml-auto text-[9px] text-gray-400 shrink-0">{lesson.duration}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <ul className="divide-y divide-gray-50">
+                  {cls.curriculum.map((lesson, i) => (
+                    <li key={i} className="flex items-start gap-2 px-3 py-2.5">
+                      <span className={`mt-0.5 w-4 h-4 rounded-full ${t.currNum} text-[9px] font-bold flex items-center justify-center shrink-0`}>
+                        {i + 1}
+                      </span>
+                      <p className="text-xs text-slate-600 leading-snug">{lesson.title}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
+        </div>
+      )}
+
+      {/* Price tag */}
+      {cls.price > 0 && (
+        <div className="mx-5 mb-3 flex items-center justify-between">
+          <span className="text-xs text-gray-400 font-medium">Course fee</span>
+          <span className="text-base font-black text-slate-800">₹{cls.price.toLocaleString("en-IN")}</span>
         </div>
       )}
 
       {/* CTAs */}
       <div className="mt-auto px-5 pb-5 flex flex-col gap-2.5">
-        <button className={`w-full py-2.5 ${t.btnPrimary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}>
-          Apply for Full Course
-        </button>
+        {cls.price > 0 ? (
+          <button
+            onClick={() => navigate(`/checkout/${cls._id}`)}
+            className={`w-full py-2.5 ${t.btnPrimary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}
+          >
+            Buy Now — ₹{cls.price.toLocaleString("en-IN")}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate(`/apply/${cls._id}`)}
+            className={`w-full py-2.5 ${t.btnPrimary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}
+          >
+            Apply for Full Course
+          </button>
+        )}
         <button
           onClick={() => onBookDemo(cls)}
           className={`w-full py-2.5 ${t.btnSecondary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}

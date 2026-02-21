@@ -16,6 +16,9 @@ import CoursePlayer from "./pages/CoursePlayer";
 import Checkout from "./pages/Checkout";
 import OurCourses from "./pages/OurCourses";
 import BookDemo from "./pages/BookDemo";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import ApplyFullCourse from "./pages/ApplyFullCourse";
 
 function App() {
   return (
@@ -28,6 +31,8 @@ function App() {
         <Route path="/dashboard/:tab" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/about" element={<About />} />
         <Route path="/our-courses" element={<OurCourses />} />
         <Route path="/contact" element={<Contact />} />
@@ -38,6 +43,7 @@ function App() {
         <Route path="/junior/trophies" element={<JuniorTrophies />} />
         <Route path="/course/play/:id" element={<CoursePlayer />} />
         <Route path="/checkout/:courseId?" element={<Checkout />} />
+        <Route path="/apply/:id" element={<ApplyFullCourse />} />
       </Routes>
     </Router>
   );

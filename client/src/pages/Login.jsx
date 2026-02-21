@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API_BASE from "../config/api";
+import Logo from "../assets/acad_learn _symbol.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -39,11 +40,11 @@ const Login = () => {
 
       <div className="w-full max-w-md p-8 bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 relative z-10">
         <div className="text-center mb-8">
-          <Link
-            to="/"
-            className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent inline-block mb-2"
-          >
-            AcadLearn
+          <Link to="/" className="inline-flex flex-col items-center gap-1 mb-2">
+            <img src={Logo} alt="AcadLearn" className="w-12 h-12 object-contain" />
+            <span className="text-2xl font-bold bg-linear-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
+              AcadLearn
+            </span>
           </Link>
           <h2 className="text-2xl font-bold text-dark">Welcome Back</h2>
           <p className="text-gray-500">
@@ -70,12 +71,12 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-sm text-orange-500 hover:text-orange-600"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <input
               type="password"

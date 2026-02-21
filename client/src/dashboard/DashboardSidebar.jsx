@@ -35,7 +35,7 @@ const NAV_ICONS = {
   ),
 };
 
-const DashboardSidebar = ({ user, activeTab, bookings, onLogout }) => {
+const DashboardSidebar = ({ user, activeNav, bookings, onLogout }) => {
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
 
   return (
@@ -61,7 +61,7 @@ const DashboardSidebar = ({ user, activeTab, bookings, onLogout }) => {
             key={item.key}
             to={item.path}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              activeTab === item.key
+              activeNav === item.key
                 ? "bg-orange-50 text-orange-600"
                 : "text-gray-500 hover:bg-gray-50 hover:text-slate-700"
             }`}

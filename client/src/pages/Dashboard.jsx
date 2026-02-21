@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   const {
     user, setUser, handleLogout,
-    classes, classesLoading, classesError, activeCategory, setActiveCategory,
+    classes, setClasses, classesLoading, classesError, activeCategory, setActiveCategory,
     bookings, bookingsLoading, loadBookings,
     handleCancel, handleStatusUpdate,
     demoSessions,
@@ -37,7 +37,7 @@ const Dashboard = () => {
   const renderTab = () => {
     switch (tab) {
       case "overview":
-        return <OverviewTab user={user} classes={classes} bookings={bookings} onNav={handleNav} />;
+        return <OverviewTab user={user} classes={classes} bookings={bookings} demoSessions={demoSessions} onNav={handleNav} onBookDemo={setSelectedClass} />;
       case "classes":
         return (
           <ClassesTab
@@ -47,6 +47,8 @@ const Dashboard = () => {
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
             onBookDemo={setSelectedClass}
+            user={user}
+            onCourseCreated={(newClass) => setClasses((prev) => [newClass, ...prev])}
           />
         );
       case "bookings":
@@ -68,13 +70,13 @@ const Dashboard = () => {
       case "admin":
         return <AdminTab token={user.token} />;
       default:
-        return <OverviewTab user={user} classes={classes} bookings={bookings} onNav={handleNav} />;
+        return <OverviewTab user={user} classes={classes} bookings={bookings} demoSessions={demoSessions} onNav={handleNav} onBookDemo={setSelectedClass} />;
     }
   };
 
   const sidebarProps = {
     user,
-    activeTab: tab,
+    activeNav: tab,
     bookings,
     onLogout: handleLogout,
   };
