@@ -11,7 +11,8 @@ const JuniorHome = () => {
   const navigate = useNavigate();
 
   const handleBookDemo = () => {
-    navigate("/book-demo");
+    // navigate("/book-demo");
+    navigate("/login");
   };
 
   const handleWatchVideo = () => {
