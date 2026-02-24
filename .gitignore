@@ -22,7 +22,7 @@ bun.*
 *.njsproj
 *.sln
 *.sw?
-server/*
 
 node_modules
-*.md
+# server/*
+# *.md
