@@ -18,6 +18,7 @@ const EMPTY_FORM = {
   universityId:       "",
   universityName:     "",
   targetDepartments:  [],
+  allowPublicBooking: true,
 };
 
 const SHOW_ON_LABELS = { junior: "Junior", professional: "Professional", both: "Both" };
@@ -166,6 +167,7 @@ const PromoteTab = ({ token }) => {
       universityId:      b.universityId      || "",
       universityName:    b.universityName    || "",
       targetDepartments: Array.isArray(b.targetDepartments) ? b.targetDepartments : [],
+      allowPublicBooking: b.allowPublicBooking !== false,
     });
     setPreview(b.imageUrl);
     setEditId(b._id); setMsg("");
@@ -292,6 +294,11 @@ const PromoteTab = ({ token }) => {
                             {d}
                           </span>
                         ))}
+                        {b.allowPublicBooking === false && (
+                          <span className="text-[10px] font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                            🔒 Banner-only booking
+                          </span>
+                        )}
                       </div>
                     )}
                     <p className="text-[10px] text-gray-400 mt-0.5">Order: {b.order}</p>
@@ -634,6 +641,28 @@ const PromoteTab = ({ token }) => {
                           <span className="text-[11px] text-gray-400 italic">Koi department select nahi</span>
                         )}
                       </div>
+                    )}
+
+                    {/* Allow public booking toggle — only shown when university is linked */}
+                    {form.universityId && (
+                      <label className="flex items-start gap-3 cursor-pointer mt-2 p-3 rounded-xl border border-dashed border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={form.allowPublicBooking}
+                          onChange={(e) => setForm((f) => ({ ...f, allowPublicBooking: e.target.checked }))}
+                          className="mt-0.5 w-4 h-4 accent-orange-500 shrink-0"
+                        />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-700 leading-snug">
+                            Allow all users to book directly
+                          </p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            {form.allowPublicBooking
+                              ? "Sabhi users course card se bhi book kar sakte hain (default)"
+                              : "Sirf banner click se booking hogi — course card ka button disable ho jaayega"}
+                          </p>
+                        </div>
+                      </label>
                     )}
                   </div>
                 </div>

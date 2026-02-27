@@ -42,7 +42,7 @@ const ChevronIcon = ({ open }) => (
   </svg>
 );
 
-const ClassCard = ({ cls, onBookDemo }) => {
+const ClassCard = ({ cls, onBookDemo, locked = false }) => {
   const [curriculumOpen, setCurriculumOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -150,19 +150,19 @@ const ClassCard = ({ cls, onBookDemo }) => {
             Apply for Full Course
           </button>
         )}
-        {cls.nextDemoSession ? (
-          <button
-            onClick={() => onBookDemo(cls)}
-            className={`w-full py-2.5 ${t.btnSecondary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}
-          >
-            Book Free Demo
-          </button>
-        ) : (
+        {locked || !cls.nextDemoSession ? (
           <button
             disabled
             className="w-full py-2.5 bg-gray-100 text-gray-400 text-xs font-bold rounded-xl uppercase tracking-wide cursor-not-allowed"
           >
             No Demo Scheduled
+          </button>
+        ) : (
+          <button
+            onClick={() => onBookDemo(cls)}
+            className={`w-full py-2.5 ${t.btnSecondary} text-xs font-bold rounded-xl uppercase tracking-wide transition-colors`}
+          >
+            Book Free Demo
           </button>
         )}
       </div>

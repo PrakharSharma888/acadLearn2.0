@@ -40,6 +40,23 @@ const useDashboard = () => {
     fetchClasses();
   }, [activeCategory]);
 
+  // ── Banners → locked course IDs ───────────────────────────────────────────
+  const [lockedCourseIds, setLockedCourseIds] = useState(new Set());
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/banners`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((banners) => {
+        const ids = new Set(
+          banners
+            .filter((b) => b.classId && b.universityId && b.allowPublicBooking === false)
+            .map((b) => b.classId)
+        );
+        setLockedCourseIds(ids);
+      })
+      .catch(() => {});
+  }, []);
+
   // ── Demo Sessions (public, upcoming) ─────────────────────────────────────
   const [demoSessions, setDemoSessions] = useState([]);
 
@@ -136,6 +153,8 @@ const useDashboard = () => {
     handleStatusUpdate,
     // demo sessions
     demoSessions,
+    // locked courses (banner-only booking)
+    lockedCourseIds,
   };
 };
 

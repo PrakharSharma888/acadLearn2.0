@@ -160,7 +160,15 @@ const ProfessionalHome = () => {
     // else: no action for banners without classId or link
   };
 
+  // Set of courseIds whose booking is locked to banner-only
+  const lockedCourseIds = new Set(
+    banners
+      .filter((b) => b.classId && b.universityId && b.allowPublicBooking === false)
+      .map((b) => b.classId)
+  );
+
   const handleCourseBookDemo = (course) => {
+    if (lockedCourseIds.has(course._id)) return; // button is disabled
     if (!course.nextDemoSession) {
       setNoDemoMsg((prev) => ({ ...prev, [course._id]: true }));
       setTimeout(() => setNoDemoMsg((prev) => ({ ...prev, [course._id]: false })), 3000);
@@ -341,20 +349,33 @@ const ProfessionalHome = () => {
                         </li>
                       )}
                     </ul>
-                    <button
-                      onClick={() => handleCourseBookDemo(course)}
-                      className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                        course.nextDemoSession
-                          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
-                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      {course.nextDemoSession ? "Book a Demo" : "No Demo Scheduled"}
-                    </button>
-                    {noDemoMsg[course._id] && (
-                      <p className="mt-2 text-xs text-red-500 font-medium text-center">
-                        Demo not scheduled for this course yet.
-                      </p>
+                    {lockedCourseIds.has(course._id) ? (
+                      <div className="mt-2">
+                        <button
+                          disabled
+                          className="inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold bg-gray-200 text-gray-400 cursor-not-allowed"
+                        >
+                          No Demo Scheduled
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleCourseBookDemo(course)}
+                          className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                            course.nextDemoSession
+                              ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
+                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          }`}
+                        >
+                          {course.nextDemoSession ? "Book a Demo" : "No Demo Scheduled"}
+                        </button>
+                        {noDemoMsg[course._id] && (
+                          <p className="mt-2 text-xs text-red-500 font-medium text-center">
+                            Demo not scheduled for this course yet.
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

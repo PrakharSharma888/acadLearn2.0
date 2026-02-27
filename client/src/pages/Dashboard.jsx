@@ -25,6 +25,7 @@ const Dashboard = () => {
     bookings, bookingsLoading, loadBookings,
     handleCancel, handleStatusUpdate,
     demoSessions,
+    lockedCourseIds,
   } = useDashboard();
 
   const handleNav = (pathOrKey) => {
@@ -51,6 +52,7 @@ const Dashboard = () => {
             onBookDemo={setSelectedClass}
             user={user}
             onCourseCreated={(newClass) => setClasses((prev) => [newClass, ...prev])}
+            lockedCourseIds={lockedCourseIds}
           />
         );
       case "bookings":

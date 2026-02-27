@@ -406,7 +406,7 @@ const AddCourseModal = ({ token, onClose, onCreated }) => {
 };
 
 // ── Main ClassesTab ──────────────────────────────────────────────────────────
-const ClassesTab = ({ classes, loading, error, activeCategory, setActiveCategory, onBookDemo, user, onCourseCreated }) => {
+const ClassesTab = ({ classes, loading, error, activeCategory, setActiveCategory, onBookDemo, user, onCourseCreated, lockedCourseIds = new Set() }) => {
   const [showModal, setShowModal] = useState(false);
   const isAdmin = user?.role === "admin";
 
@@ -481,7 +481,7 @@ const ClassesTab = ({ classes, loading, error, activeCategory, setActiveCategory
       {!loading && !error && classes.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {classes.map((cls) => (
-            <ClassCard key={cls._id} cls={cls} onBookDemo={onBookDemo} />
+            <ClassCard key={cls._id} cls={cls} onBookDemo={onBookDemo} locked={lockedCourseIds.has(cls._id)} />
           ))}
         </div>
       )}
