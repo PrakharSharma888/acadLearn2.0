@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import API_BASE from "../config/api";
 import { authHeader } from "./constants";
@@ -22,6 +22,81 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
       setEditForm({ name: user.name || "", email: user.email || "" });
     }
   }, [user.name, user.email]);
+
+  // ── Academic Info state ────────────────────────────────────────────────────
+  const [universities,   setUniversities]   = useState([]);
+  const [acadForm,       setAcadForm]       = useState({
+    phone:          user.phone        || "",
+    universityId:   user.university   || "",
+    department:     user.department   || "",
+    year:           user.year         || "",
+    semester:       user.semester     || "",
+  });
+  const [acadDepts,      setAcadDepts]      = useState([]);
+  const [acadMsg,        setAcadMsg]        = useState({ text: "", type: "" });
+  const [acadLoading,    setAcadLoading]    = useState(false);
+
+  const loadUniversities = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/universities`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setUniversities(data);
+      // Pre-fill departments if user already has a university
+      if (user.university) {
+        const found = data.find((u) => u._id === user.university);
+        if (found) setAcadDepts(found.departments || []);
+      }
+    } catch {}
+  }, [user.university]);
+
+  useEffect(() => { loadUniversities(); }, [loadUniversities]);
+
+  const handleUniversityChange = (e) => {
+    const univId = e.target.value;
+    const found = universities.find((u) => u._id === univId);
+    setAcadDepts(found ? found.departments : []);
+    setAcadForm((p) => ({ ...p, universityId: univId, department: "" }));
+  };
+
+  const handleAcadSubmit = async (e) => {
+    e.preventDefault();
+    setAcadLoading(true);
+    setAcadMsg({ text: "", type: "" });
+    const selectedUniv = universities.find((u) => u._id === acadForm.universityId);
+    try {
+      const res = await fetch(`${API_BASE}/api/profile/me`, {
+        method: "PUT",
+        headers: authHeader(token),
+        body: JSON.stringify({
+          phone: acadForm.phone,
+          university: acadForm.universityId || null,
+          universityName: selectedUniv ? selectedUniv.name : "",
+          department: acadForm.department,
+          year: acadForm.year,
+          semester: acadForm.semester,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      const updated = {
+        ...user,
+        phone: data.phone,
+        university: data.university,
+        universityName: data.universityName,
+        department: data.department,
+        year: data.year,
+        semester: data.semester,
+      };
+      localStorage.setItem("userInfo", JSON.stringify({ ...updated, token }));
+      onUserUpdate(updated);
+      setAcadMsg({ text: "Academic info saved!", type: "success" });
+    } catch (err) {
+      setAcadMsg({ text: err.message || "Failed to save", type: "error" });
+    } finally {
+      setAcadLoading(false);
+    }
+  };
   const [pwdForm,   setPwdForm]   = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [editMsg,   setEditMsg]   = useState({ text: "", type: "" });
   const [pwdMsg,    setPwdMsg]    = useState({ text: "", type: "" });
@@ -147,6 +222,91 @@ const ProfileTab = ({ user, token, onUserUpdate }) => {
             className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
           >
             {editLoading ? "Saving..." : "Save Changes"}
+          </button>
+        </form>
+      </div>
+
+      {/* Academic Info */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h3 className="text-sm font-bold text-slate-700 mb-4">Academic Info</h3>
+        <form onSubmit={handleAcadSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Phone Number</label>
+            <input
+              type="tel"
+              className={INPUT_CLS}
+              placeholder="e.g. 9876543210"
+              value={acadForm.phone}
+              onChange={(e) => setAcadForm((p) => ({ ...p, phone: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">University</label>
+            <select
+              className={INPUT_CLS}
+              value={acadForm.universityId}
+              onChange={handleUniversityChange}
+            >
+              <option value="">-- Select University --</option>
+              {universities.map((u) => (
+                <option key={u._id} value={u._id}>{u.name}{u.shortName ? ` (${u.shortName})` : ""}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Department</label>
+            <select
+              className={INPUT_CLS}
+              value={acadForm.department}
+              onChange={(e) => setAcadForm((p) => ({ ...p, department: e.target.value }))}
+              disabled={acadDepts.length === 0}
+            >
+              <option value="">-- Select Department --</option>
+              {acadDepts.map((d) => (
+                <option key={d._id} value={d.name}>{d.name}{d.code ? ` (${d.code})` : ""}</option>
+              ))}
+            </select>
+            {acadForm.universityId && acadDepts.length === 0 && (
+              <p className="text-xs text-gray-400 mt-1">No departments added for this university yet.</p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Year</label>
+              <select
+                className={INPUT_CLS}
+                value={acadForm.year}
+                onChange={(e) => setAcadForm((p) => ({ ...p, year: e.target.value }))}
+              >
+                <option value="">-- Year --</option>
+                {["1st Year", "2nd Year", "3rd Year", "4th Year"].map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Semester</label>
+              <select
+                className={INPUT_CLS}
+                value={acadForm.semester}
+                onChange={(e) => setAcadForm((p) => ({ ...p, semester: e.target.value }))}
+              >
+                <option value="">-- Semester --</option>
+                {["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8"].map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {acadMsg.text && (
+            <p className={`text-xs rounded-xl px-4 py-3 ${msgClass(acadMsg.type)}`}>{acadMsg.text}</p>
+          )}
+          <button
+            type="submit"
+            disabled={acadLoading}
+            className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
+          >
+            {acadLoading ? "Saving..." : "Save Academic Info"}
           </button>
         </form>
       </div>

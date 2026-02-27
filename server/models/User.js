@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordToken:   { type: String },
     resetPasswordExpires: { type: Date },
+    phone:          { type: String, default: "" },
+    university:     { type: mongoose.Schema.Types.ObjectId, ref: "University", default: null },
+    universityName: { type: String, default: "" },
+    department:     { type: String, default: "" },
+    year:           { type: String, default: "" },
+    semester:       { type: String, default: "" },
   },
   { timestamps: true }
 );

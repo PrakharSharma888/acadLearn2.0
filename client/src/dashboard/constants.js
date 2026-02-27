@@ -27,4 +27,6 @@ export const NAV_ITEMS = [
   { key: "progress", label: "Progress", path: "/dashboard/progress" },
   { key: "profile", label: "Profile", path: "/dashboard/profile" },
   { key: "admin", label: "Admin Panel", path: "/dashboard/admin", adminOnly: true },
+  { key: "universities", label: "Universities", path: "/dashboard/universities", adminOnly: true },
+  { key: "promote",      label: "Promote",      path: "/dashboard/promote",      adminOnly: true },
 ];

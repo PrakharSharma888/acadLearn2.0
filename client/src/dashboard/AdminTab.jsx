@@ -8,6 +8,9 @@ const EMPTY_CLASS = {
   instructor: "AcadLearn Team", description: "", duration: "", badge: "", totalLessons: "",
 };
 
+const EMPTY_UNIV = { name: "", shortName: "" };
+const EMPTY_DEPT = { universityId: "", name: "", code: "" };
+
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
@@ -60,6 +63,8 @@ const AdminTab = ({ token }) => {
   const [classForm, setClassForm] = useState(EMPTY_CLASS);
   const [classSaving, setClassSaving] = useState(false);
   const [classMsg,    setClassMsg]    = useState("");
+  const [classPage,   setClassPage]   = useState(0);
+  const CLASS_PAGE_SIZE = 10;
 
   const handleClassChange = (e) => {
     const { name, value } = e.target;
@@ -117,10 +122,86 @@ const AdminTab = ({ token }) => {
     return diff >= 0 && diff <= 7;
   };
 
+  // ── University management ──────────────────────────────────────────────────
+  const [universities,      setUniversities]      = useState([]);
+  const [loadingUnivs,      setLoadingUnivs]      = useState(true);
+  const [univForm,          setUnivForm]          = useState(EMPTY_UNIV);
+  const [deptForm,          setDeptForm]          = useState(EMPTY_DEPT);
+  const [univMsg,           setUnivMsg]           = useState("");
+  const [deptMsg,           setDeptMsg]           = useState("");
+  const [univSaving,        setUnivSaving]        = useState(false);
+  const [deptSaving,        setDeptSaving]        = useState(false);
+
+  const loadUniversities = useCallback(async () => {
+    setLoadingUnivs(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/universities/all`, { headers: authHeader(token) });
+      if (!res.ok) throw new Error();
+      setUniversities(await res.json());
+    } catch { setUniversities([]); }
+    finally { setLoadingUnivs(false); }
+  }, [token]);
+
+  useEffect(() => { loadUniversities(); }, [loadUniversities]);
+
+  const handleCreateUniversity = async (e) => {
+    e.preventDefault();
+    setUnivSaving(true); setUnivMsg("");
+    try {
+      const res = await fetch(`${API_BASE}/api/universities`, {
+        method: "POST", headers: authHeader(token), body: JSON.stringify(univForm),
+      });
+      const data = await res.json();
+      if (!res.ok) { setUnivMsg(data.message || "Failed"); return; }
+      setUnivMsg("University created!");
+      setUnivForm(EMPTY_UNIV);
+      await loadUniversities();
+    } catch { setUnivMsg("Server error."); }
+    finally { setUnivSaving(false); }
+  };
+
+  const handleAddDepartment = async (e) => {
+    e.preventDefault();
+    if (!deptForm.universityId) { setDeptMsg("Select a university first"); return; }
+    setDeptSaving(true); setDeptMsg("");
+    try {
+      const res = await fetch(`${API_BASE}/api/universities/${deptForm.universityId}/departments`, {
+        method: "POST", headers: authHeader(token),
+        body: JSON.stringify({ name: deptForm.name, code: deptForm.code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setDeptMsg(data.message || "Failed"); return; }
+      setDeptMsg("Department added!");
+      setDeptForm((p) => ({ ...p, name: "", code: "" }));
+      await loadUniversities();
+    } catch { setDeptMsg("Server error."); }
+    finally { setDeptSaving(false); }
+  };
+
+  const handleDeleteUniversity = async (id, name) => {
+    if (!window.confirm(`Delete "${name}" and all its departments? This cannot be undone.`)) return;
+    try {
+      await fetch(`${API_BASE}/api/universities/${id}`, { method: "DELETE", headers: authHeader(token) });
+      await loadUniversities();
+    } catch { alert("Could not delete university."); }
+  };
+
+  const handleDeleteDepartment = async (univId, deptId, deptName) => {
+    if (!window.confirm(`Remove department "${deptName}"?`)) return;
+    try {
+      await fetch(`${API_BASE}/api/universities/${univId}/departments/${deptId}`, {
+        method: "DELETE", headers: authHeader(token),
+      });
+      await loadUniversities();
+    } catch { alert("Could not delete department."); }
+  };
+
   const SECTIONS = [
-    { key: "sessions", label: "Demo Sessions" },
-    { key: "classes",  label: "All Classes" },
-    { key: "add",      label: "+ Add Class" },
+    { key: "sessions",       label: "Demo Sessions" },
+    { key: "classes",        label: "All Classes" },
+    { key: "add",            label: "+ Add Class" },
+    { key: "universities",   label: "Universities" },
+    { key: "add-university", label: "+ Add University" },
   ];
 
   // ── render ────────────────────────────────────────────────────────────────
@@ -265,6 +346,7 @@ const AdminTab = ({ token }) => {
               <button onClick={() => setSection("add")} className="text-orange-600 font-semibold hover:underline">Add one</button>
             </div>
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
@@ -278,7 +360,7 @@ const AdminTab = ({ token }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {allClasses.map((cls) => (
+                  {allClasses.slice(classPage * CLASS_PAGE_SIZE, (classPage + 1) * CLASS_PAGE_SIZE).map((cls) => (
                     <tr key={cls._id} className="hover:bg-gray-50/60 transition-colors">
                       <td className="px-6 py-4">
                         <p className="font-semibold text-slate-700">{cls.title}</p>
@@ -320,7 +402,200 @@ const AdminTab = ({ token }) => {
                 </tbody>
               </table>
             </div>
+            {/* Pagination */}
+            {allClasses.length > CLASS_PAGE_SIZE && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+                <p className="text-xs text-gray-400">
+                  Showing {classPage * CLASS_PAGE_SIZE + 1}–{Math.min((classPage + 1) * CLASS_PAGE_SIZE, allClasses.length)} of {allClasses.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setClassPage((p) => p - 1)}
+                    disabled={classPage === 0}
+                    className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Prev
+                  </button>
+                  {Array.from({ length: Math.ceil(allClasses.length / CLASS_PAGE_SIZE) }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setClassPage(i)}
+                      className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${
+                        classPage === i ? "bg-orange-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setClassPage((p) => p + 1)}
+                    disabled={classPage >= Math.ceil(allClasses.length / CLASS_PAGE_SIZE) - 1}
+                    className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+            </>
           )}
+        </div>
+      )}
+
+      {/* ── Universities list ── */}
+      {section === "universities" && (
+        <div className="space-y-4">
+          {loadingUnivs ? (
+            <div className="bg-white rounded-2xl border border-gray-100 px-6 py-12 text-center text-gray-400 text-sm">Loading…</div>
+          ) : universities.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 px-6 py-12 text-center text-gray-400 text-sm">
+              No universities yet.{" "}
+              <button onClick={() => setSection("add-university")} className="text-orange-600 font-semibold hover:underline">Add one</button>
+            </div>
+          ) : (
+            universities.map((univ) => (
+              <div key={univ._id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-800">{univ.name}</p>
+                    {univ.shortName && <p className="text-xs text-gray-400">{univ.shortName}</p>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">{univ.departments.length} departments</span>
+                    <button
+                      onClick={() => handleDeleteUniversity(univ._id, univ.name)}
+                      className="text-red-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                      title="Delete university"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                {univ.departments.length > 0 ? (
+                  <div className="divide-y divide-gray-50">
+                    {univ.departments.map((dept) => (
+                      <div key={dept._id} className="px-6 py-3 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-slate-700 font-medium">{dept.name}</span>
+                          {dept.code && (
+                            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">{dept.code}</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteDepartment(univ._id, dept._id, dept.name)}
+                          className="text-red-300 hover:text-red-500 p-1 rounded hover:bg-red-50 transition-colors"
+                          title="Remove department"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="px-6 py-3 text-xs text-gray-400">No departments added yet.</p>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ── Add University / Department form ── */}
+      {section === "add-university" && (
+        <div className="space-y-6">
+          {/* Create University */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 className="font-semibold text-slate-700 mb-5">Create New University</h2>
+            <form onSubmit={handleCreateUniversity} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">University Name <span className="text-red-400">*</span></label>
+                  <input
+                    value={univForm.name}
+                    onChange={(e) => setUnivForm((p) => ({ ...p, name: e.target.value }))}
+                    required placeholder="e.g. Delhi University"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Short Name / Abbreviation</label>
+                  <input
+                    value={univForm.shortName}
+                    onChange={(e) => setUnivForm((p) => ({ ...p, shortName: e.target.value }))}
+                    placeholder="e.g. DU"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button type="submit" disabled={univSaving}
+                  className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60">
+                  {univSaving ? "Creating…" : "Create University"}
+                </button>
+                {univMsg && (
+                  <p className={`text-sm font-medium ${univMsg.includes("!") ? "text-green-600" : "text-red-500"}`}>{univMsg}</p>
+                )}
+              </div>
+            </form>
+          </div>
+
+          {/* Add Department */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 className="font-semibold text-slate-700 mb-5">Add Department to University</h2>
+            {universities.length === 0 ? (
+              <p className="text-sm text-gray-400">Create a university first before adding departments.</p>
+            ) : (
+              <form onSubmit={handleAddDepartment} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Select University <span className="text-red-400">*</span></label>
+                  <select
+                    value={deptForm.universityId}
+                    onChange={(e) => setDeptForm((p) => ({ ...p, universityId: e.target.value }))}
+                    required
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  >
+                    <option value="">-- Select University --</option>
+                    {universities.map((u) => (
+                      <option key={u._id} value={u._id}>{u.name}{u.shortName ? ` (${u.shortName})` : ""}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Department Name <span className="text-red-400">*</span></label>
+                    <input
+                      value={deptForm.name}
+                      onChange={(e) => setDeptForm((p) => ({ ...p, name: e.target.value }))}
+                      required placeholder="e.g. Computer Science"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Department Code</label>
+                    <input
+                      value={deptForm.code}
+                      onChange={(e) => setDeptForm((p) => ({ ...p, code: e.target.value }))}
+                      placeholder="e.g. CS"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button type="submit" disabled={deptSaving}
+                    className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60">
+                    {deptSaving ? "Adding…" : "Add Department"}
+                  </button>
+                  {deptMsg && (
+                    <p className={`text-sm font-medium ${deptMsg.includes("!") ? "text-green-600" : "text-red-500"}`}>{deptMsg}</p>
+                  )}
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       )}
 

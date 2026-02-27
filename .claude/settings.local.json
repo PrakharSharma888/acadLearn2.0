@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(cat /Users/sahilnagpal/Documents/GitHub/acadLearn2.0/server/routes/*.js)",
+      "Bash(xxd)"
     ]
   }
 }

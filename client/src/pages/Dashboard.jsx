@@ -9,7 +9,9 @@ import ClassesTab     from "../dashboard/ClassesTab";
 import BookingsTab    from "../dashboard/BookingsTab";
 import ProgressTab    from "../dashboard/ProgressTab";
 import ProfileTab     from "../dashboard/ProfileTab";
-import AdminTab       from "../dashboard/AdminTab";
+import AdminTab          from "../dashboard/AdminTab";
+import UniversitiesTab  from "../dashboard/UniversitiesTab";
+import PromoteTab        from "../dashboard/PromoteTab";
 
 const Dashboard = () => {
   const { tab } = useParams();
@@ -69,6 +71,10 @@ const Dashboard = () => {
         return <ProfileTab user={user} token={user.token} onUserUpdate={setUser} />;
       case "admin":
         return <AdminTab token={user.token} />;
+      case "universities":
+        return <UniversitiesTab token={user.token} />;
+      case "promote":
+        return <PromoteTab token={user.token} />;
       default:
         return <OverviewTab user={user} classes={classes} bookings={bookings} demoSessions={demoSessions} onNav={handleNav} onBookDemo={setSelectedClass} />;
     }

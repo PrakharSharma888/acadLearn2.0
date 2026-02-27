@@ -19,7 +19,9 @@ const classRoutes = require("./routes/classRoutes");
 const demoBookingRoutes = require("./routes/demoBookingRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const demoSessionRoutes = require("./routes/demoSessionRoutes");
-const paymentRoutes     = require("./routes/paymentRoutes");
+const paymentRoutes      = require("./routes/paymentRoutes");
+const universityRoutes   = require("./routes/universityRoutes");
+const bannerRoutes       = require("./routes/bannerRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/classes", classRoutes);
@@ -27,6 +29,8 @@ app.use("/api/demo-booking", demoBookingRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/demo-sessions", demoSessionRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/universities", universityRoutes);
+app.use("/api/banners",      bannerRoutes);
 
 // Database Connection
 mongoose

@@ -1,597 +1,595 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import ProHeroImg from "../assets/pro-hero.png";
-import Pro1 from "../assets/pro1.png";
-import Pro2 from "../assets/pro2.png";
-import Pro3 from "../assets/pro3.png";
+import Logo from "../assets/logo.jpeg";
 import Pro4 from "../assets/pro4.png";
 import Pro5 from "../assets/pro5.png";
 import Pro6 from "../assets/pro6.png";
-import Logo from "../assets/logo.jpeg";
+import API_BASE from "../config/api";
+import BannerCarousel from "../components/BannerCarousel";
+import BookDemoModal from "../components/BookDemoModal";
 
-const ProfessionalHome = () => {
-  const [activeCategory, setActiveCategory] = useState("All Courses");
+// ── Navbar ─────────────────────────────────────────────────────────────────────
+const ProNavbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter" || e.type === "click") {
-      console.log("Searching...");
+  useEffect(() => {
+    const info = localStorage.getItem("userInfo");
+    if (info) setUser(JSON.parse(info));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userInfo");
+    setUser(null);
+    navigate("/login");
+  };
+
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const goToCourses = () => {
+    setOpen(false);
+    if (location.pathname === "/professional") {
+      scrollTo("pro-courses-section");
+    } else {
+      navigate("/professional");
+      setTimeout(() => scrollTo("pro-courses-section"), 300);
     }
-  };
-
-  const handleNavClick = (sectionId, e) => {
-    e.preventDefault();
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const handleEnroll = (title) => {
-    navigate(`/checkout/${title.toLowerCase().replace(/\s+/g, "-")}`);
-  };
-
-  const handleCategoryClick = (cat) => {
-    setActiveCategory(cat);
-    console.log("Filter by:", cat);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-slate-800">
-      {/* Header */}
-      <nav className="bg-white border-b border-gray-100 py-4 sticky top-0 z-50">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded overflow-hidden flex items-center justify-center">
-              <img
-                src={Logo}
-                alt="AcadLearn Pro Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              AcadLearn <span className="text-blue-600">Pro</span>
-            </span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a
-              href="#"
-              onClick={(e) => handleNavClick("courses-section", e)}
-              className="hover:text-blue-600"
-            >
-              Browse Courses
-            </a>
-            <a
-              href="#"
-              onClick={(e) => handleNavClick("pricing", e)}
-              className="hover:text-blue-600"
-            >
-              Pricing
-            </a>
-            <a
-              href="#"
-              onClick={(e) => handleNavClick("teams", e)}
-              className="hover:text-blue-600"
-            >
-              For Teams
-            </a>
+    <nav className="border-b border-dashed border-gray-200 px-4 py-3 bg-white/70 backdrop-blur-sm sticky top-0 z-50">
+      <div className="container mx-auto flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 sm:gap-3">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 overflow-hidden flex items-center justify-center shrink-0">
+            <img src={Logo} alt="AcadLearn Pro Logo" className="w-full h-full object-contain" />
           </div>
+          <span className="text-lg sm:text-2xl font-black text-gray-800 tracking-tight leading-none whitespace-nowrap">
+            Acad<span className="text-blue-600">Learn Pro.</span>
+          </span>
+        </Link>
 
-          <div className="flex items-center gap-4">
-            <Link
-              to="/login"
-              className="px-5 py-2 text-sm font-semibold border border-gray-200 rounded text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              to="/signup"
-              className="px-5 py-2 text-sm font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition-colors"
-            >
-              Sign Up
-            </Link>
-          </div>
+        {/* Center nav */}
+        <div className="hidden lg:flex items-center gap-6 flex-1 justify-center text-sm font-bold">
+          <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</Link>
+          <button
+            type="button"
+            onClick={goToCourses}
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Our Courses
+          </button>
+          <Link to="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">Contact Us</Link>
         </div>
-      </nav>
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="bg-[#1e293b] rounded-3xl p-10 md:p-20 text-center relative overflow-hidden mb-12 group">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src={ProHeroImg}
-              alt="Professional Background"
-              className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b]/80 to-[#1e293b]/90"></div>
-          </div>
-
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <svg
-              className="w-full h-full"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-            >
-              <path d="M0 100 L0 0 L100 0 L100 100 Z" fill="#ffffff" />
-              <path d="M0 100 L50 0 L100 100 Z" fill="#000000" opacity="0.1" />
-            </svg>
-          </div>
-
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              Advance Your Career with <br /> Expert-Led Courses
-            </h1>
-            <p className="text-blue-100 text-lg mb-10">
-              Join 50,000+ professionals mastering new skills today.
-            </p>
-
-            <div className="bg-white p-2 rounded-lg max-w-2xl mx-auto flex shadow-xl">
-              <div className="flex-1 flex items-center px-4 border-r border-gray-200">
-                <svg
-                  className="w-5 h-5 text-gray-400 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-                <input
-                  type="text"
-                  placeholder="What do you want to learn today?"
-                  className="w-full outline-none text-gray-700"
-                  onKeyDown={handleSearch}
-                />
-              </div>
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              <Link to="/dashboard" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                Dashboard
+              </Link>
               <button
-                onClick={handleSearch}
-                className="px-8 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
+                onClick={handleLogout}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
               >
-                Search
+                Logout
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 font-medium">
-                Active Learners
+              <div className="w-8 h-8 bg-linear-to-tr from-blue-600 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                {user.name?.charAt(0).toUpperCase()}
               </div>
-              <div className="text-2xl font-bold text-gray-900">50,000+</div>
-            </div>
-          </div>
-          <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4.002z" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 font-medium">
-                Expert Instructors
-              </div>
-              <div className="text-2xl font-bold text-gray-900">200+</div>
-            </div>
-          </div>
-          <div className="bg-gray-100/50 rounded-xl p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 font-medium">
-                Career Courses
-              </div>
-              <div className="text-2xl font-bold text-gray-900">150+</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="mb-12">
-          <div className="flex justify-between items-end mb-6">
-            <h2 id="courses-section" className="text-2xl font-bold">
-              Explore Categories
-            </h2>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                // Clear filter logic would go here
-                setActiveCategory("All Courses");
-              }}
-              className="text-blue-600 text-sm font-semibold hover:underline flex items-center"
-            >
-              View All{" "}
-              <svg
-                className="w-4 h-4 ml-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-gray-700 border border-blue-100 rounded-full hover:bg-blue-50 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            </a>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {[
-              "All Courses",
-              "Data Science",
-              "Product Management",
-              "Digital Marketing",
-              "Software Engineering",
-              "Leadership",
-            ].map((cat, i) => (
-              <button
-                key={i}
-                onClick={() => handleCategoryClick(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === cat
-                    ? "bg-slate-900 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="hidden sm:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 shadow-sm transition-colors"
               >
-                {cat}
-              </button>
-            ))}
-          </div>
+                Register
+              </Link>
+            </>
+          )}
+          <button
+            onClick={() => setOpen(!open)}
+            className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition"
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
         </div>
+      </div>
 
-        {/* Trending Courses */}
-        <div className="mb-20">
-          <h2 className="text-2xl font-bold mb-8">Trending Courses</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ProCourseCard
-              category="Data Science"
-              title="Advanced Data Analytics with Python"
-              desc="Master Python libraries like Pandas and NumPy to analyze complex datasets."
-              price="₹70,499"
-              rating="4.8"
-              tags={["Python", "Pandas", "Visualization"]}
-              imageColor="bg-sky-700"
-              image={Pro1}
-              onEnroll={() =>
-                handleEnroll("Advanced Data Analytics with Python")
-              }
-            />
-            <ProCourseCard
-              category="Product Mgmt"
-              title="Product Strategy for Senior Managers"
-              desc="Learn to build roadmaps, manage stakeholders, and lead product teams."
-              price="₹90,999"
-              rating="4.9"
-              tags={["Strategy", "Agile", "Leadership"]}
-              imageColor="bg-orange-800"
-              image={Pro2}
-            />
-            <ProCourseCard
-              category="Engineering"
-              title="Full-Stack Web Development Bootcamp"
-              desc="Become a full-stack developer with React, Node.js, and modern tools."
-              price="₹52,499"
-              rating="4.7"
-              tags={["React", "Node.js", "MongoDB"]}
-              imageColor="bg-slate-800"
-              image={Pro3}
-            />
-            <ProCourseCard
-              category="Marketing"
-              title="Digital Marketing & SEO Mastery"
-              desc="Drive traffic and sales with comprehensive SEO, social media strategies."
-              price="₹60,699"
-              rating="4.6"
-              tags={["SEO", "Ads", "Analytics"]}
-              imageColor="bg-emerald-700"
-              image={Pro4}
-            />
-            <ProCourseCard
-              category="Leadership"
-              title="Effective Leadership & Communication"
-              desc="Develop the soft skills needed to lead teams, resolve conflicts, and inspire."
-              price="₹80,299"
-              rating="4.9"
-              tags={["Mgmt", "Soft Skills", "Public Speaking"]}
-              imageColor="bg-neutral-800"
-              image={Pro5}
-            />
-            <ProCourseCard
-              category="Design"
-              title="UI/UX Design Fundamentals"
-              desc="Create intuitive and beautiful user interfaces. Learn Figma, wireframing."
-              price="₹92,199"
-              rating="4.7"
-              tags={["Figma", "Prototyping", "User Research"]}
-              imageColor="bg-pink-800"
-              image={Pro6}
-            />
+      {/* Mobile menu */}
+      {open && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-md z-50">
+          <div className="flex flex-col gap-4 px-6 py-4 text-sm font-bold">
+            <Link to="/about" onClick={() => setOpen(false)}>About Us</Link>
+            <button type="button" onClick={goToCourses} className="text-left">Our Courses</button>
+            <Link to="/contact" onClick={() => setOpen(false)}>Contact Us</Link>
           </div>
         </div>
-      </main>
-
-      {/* New Sections for Real Navigation */}
-      <section id="pricing" className="py-20 bg-white border-t border-gray-100">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-12">
-            Simple, Transparent Pricing
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
-              <h3 className="font-bold text-xl mb-4">Basic</h3>
-              <div className="text-4xl font-bold mb-6">
-                ₹20,499
-                <span className="text-sm text-gray-500 font-normal">/mo</span>
-              </div>
-              <ul className="text-left space-y-3 mb-8 text-gray-600">
-                <li>• Access to 100+ courses</li>
-                <li>• Community support</li>
-                <li>• Mobile app access</li>
-              </ul>
-              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
-                Start Free Trial
-              </button>
-            </div>
-            <div className="border border-blue-600 bg-blue-50 p-8 rounded-2xl hover:shadow-lg transition-all relative">
-              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
-                MOST POPULAR
-              </div>
-              <h3 className="font-bold text-xl mb-4 text-blue-900">Pro</h3>
-              <div className="text-4xl font-bold mb-6 text-blue-900">
-                ₹40,999
-                <span className="text-sm text-blue-700 font-normal">/mo</span>
-              </div>
-              <ul className="text-left space-y-3 mb-8 text-blue-800">
-                <li>• Access to ALL courses</li>
-                <li>• Certificate of completion</li>
-                <li>• 1-on-1 Mentorship</li>
-                <li>• Offline downloads</li>
-              </ul>
-              <button className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
-                Get Started
-              </button>
-            </div>
-            <div className="border border-gray-200 p-8 rounded-2xl hover:shadow-lg transition-all">
-              <h3 className="font-bold text-xl mb-4">Team</h3>
-              <div className="text-4xl font-bold mb-6">
-                ₹80,299
-                <span className="text-sm text-gray-500 font-normal">/user</span>
-              </div>
-              <ul className="text-left space-y-3 mb-8 text-gray-600">
-                <li>• Admin dashboard</li>
-                <li>• Team analytics</li>
-                <li>• SSO Integration</li>
-                <li>• Dedicated account manager</li>
-              </ul>
-              <button className="w-full py-3 border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50">
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="teams" className="py-20 bg-slate-900 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Upskill Your Entire Team</h2>
-          <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">
-            Join 500+ companies that use AcadLearn Pro to train their workforce.
-          </p>
-          <div className="flex flex-wrap justify-center gap-12 font-bold text-2xl text-slate-600 opacity-50">
-            <span>ACME Corp</span>
-            <span>Globex</span>
-            <span>Soylent Corp</span>
-            <span>Initech</span>
-            <span>Umbrella</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-100 py-12 border-t border-gray-200 text-sm">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded overflow-hidden flex items-center justify-center">
-                  <img
-                    src={Logo}
-                    alt="AcadLearn Pro Logo"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="font-bold text-slate-800">AcadLearn Pro</span>
-              </div>
-              <p className="text-gray-500">
-                Empowering professionals to achieve their career goals through
-                world-class education.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
-                Company
-              </h4>
-              <ul className="space-y-2 text-gray-500">
-                <li>
-                  <Link to="/about" className="hover:text-blue-600">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-blue-600">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-blue-600">
-                    Press
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
-                Resources
-              </h4>
-              <ul className="space-y-2 text-gray-500">
-                <li>
-                  <a href="#" className="hover:text-blue-600">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-blue-600">
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <Link to="/contact" className="hover:text-blue-600">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
-                Legal
-              </h4>
-              <ul className="space-y-2 text-gray-500">
-                <li>
-                  <Link to="/terms" className="hover:text-blue-600">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="hover:text-blue-600">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="hover:text-blue-600">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200">
-            <div className="text-gray-400 mb-4 md:mb-0">
-              © 2026 AcadLearn Pro. All rights reserved.
-            </div>
-            <div className="flex gap-4 text-gray-400">
-              <a href="#" className="hover:text-blue-600">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
-              </a>
-              <a href="#" className="hover:text-blue-600">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+      )}
+    </nav>
   );
 };
 
-const ProCourseCard = ({
-  category,
-  title,
-  desc,
-  price,
-  rating,
-  tags,
-  imageColor,
-  image,
-  onEnroll,
-}) => (
-  <div className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-    <div className={`h-48 ${imageColor} relative overflow-hidden group`}>
-      {/* Course Image */}
-      <img
-        src={image}
-        alt={title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60"></div>
-      <div className="absolute top-4 left-4 bg-white text-gray-800 text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase z-10">
-        {category}
-      </div>
+// ── Page ───────────────────────────────────────────────────────────────────────
+const ProfessionalHome = () => {
+  const navigate = useNavigate();
+  const [courses, setCourses]       = useState([]);
+  const [banners, setBanners]       = useState([]);
+  const [bannerDemo, setBannerDemo] = useState(null);
+  const [courseDemo, setCourseDemo] = useState(null);
+  const [noDemoMsg, setNoDemoMsg]   = useState({});  // courseId → true/false
+  const [user, setUser]             = useState(null);
+
+  useEffect(() => {
+    const info = localStorage.getItem("userInfo");
+    if (info) setUser(JSON.parse(info));
+  }, []);
+
+  const handleEnroll = () => navigate("/login");
+
+  const handleBannerClick = (banner) => {
+    if (banner.classId) {
+      setBannerDemo({
+        _id:               banner.classId,
+        title:             banner.className || banner.title,
+        category:          banner.category || "professional",
+        classSlug:         banner.classSlug,
+        department:        banner.department,
+        universityName:    banner.universityName    || "",
+        targetDepartments: banner.targetDepartments || [],
+      });
+    } else if (banner.link) {
+      window.open(banner.link, "_blank", "noopener,noreferrer");
+    }
+    // else: no action for banners without classId or link
+  };
+
+  const handleCourseBookDemo = (course) => {
+    if (!course.nextDemoSession) {
+      setNoDemoMsg((prev) => ({ ...prev, [course._id]: true }));
+      setTimeout(() => setNoDemoMsg((prev) => ({ ...prev, [course._id]: false })), 3000);
+      return;
+    }
+    if (!user) { navigate("/login"); return; }
+    setCourseDemo(course);
+  };
+
+  const loadData = useCallback(async () => {
+    try {
+      const [cRes, bRes] = await Promise.all([
+        fetch(`${API_BASE}/api/classes`),
+        fetch(`${API_BASE}/api/banners?page=professional`),
+      ]);
+      if (cRes.ok) {
+        const all = await cRes.json();
+        setCourses(all.filter((c) => c.category === "professional" && c.isActive));
+      }
+      if (bRes.ok) setBanners(await bRes.json());
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFF] font-sans text-gray-800 selection:bg-blue-200">
+      <ProNavbar />
+
+      <main>
+
+        {/* Section 1: Hero */}
+        <section className="container mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-12">
+          <div className="flex-1 space-y-8">
+            <h1 className="text-5xl md:text-7xl font-black leading-tight text-slate-900">
+              Advance Your Career with{" "}
+              <span className="text-blue-600">Industry-Ready Skills.</span>
+            </h1>
+            <p className="text-xl text-gray-600 font-medium max-w-lg">
+              Live, expert-led courses built for working professionals and
+              college students. Learn at your pace, get certified, and land
+              your dream role.
+            </p>
+
+            <div className="flex flex-wrap gap-6 text-sm font-bold text-gray-700">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-2xl">💼</span> Career-Focused
+              </div>
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-2xl">🎓</span> Certified Courses
+              </div>
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-2xl">🧑‍💻</span> Live Mentorship
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <button
+                onClick={handleEnroll}
+                className="px-8 py-4 bg-blue-600 text-white rounded-full font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 hover:scale-105 transition-all"
+              >
+                Enroll for Free Demo
+              </button>
+              <button
+                onClick={() => {
+                  const el = document.getElementById("pro-courses-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-8 py-4 bg-white text-blue-600 border-2 border-blue-100 rounded-full font-bold text-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+              >
+                <span>↓</span> Explore Courses
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 relative">
+            <div className="aspect-square md:aspect-4/3 bg-blue-100 rounded-[3rem] relative overflow-hidden transform -rotate-2 hover:rotate-0 transition-all duration-500">
+              <img
+                src={ProHeroImg}
+                alt="Professional learning"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-blue-900/20 to-transparent" />
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2: The "Why" */}
+        <section className="bg-white py-20 border-y border-dashed border-gray-200">
+          <div className="container mx-auto px-4 text-center">
+            <div className="inline-block px-4 py-1 bg-blue-100 text-blue-700 font-bold rounded-full mb-4 text-sm uppercase tracking-wide">
+              The Goal
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-16">
+              From a "Degree Holder" to a{" "}
+              <span className="text-blue-500">"Job-Ready Professional."</span>
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <div className="bg-red-50 p-8 rounded-3xl border-b-4 border-red-200 text-left">
+                <div className="text-4xl mb-4">📄</div>
+                <h3 className="text-xl font-black text-red-900 mb-2">The Problem</h3>
+                <p className="text-red-800/80 font-medium">
+                  Most graduates have degrees but lack the practical, in-demand
+                  skills employers actually look for.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 p-8 rounded-3xl border-b-4 border-blue-200 text-left transform md:-translate-y-4 shadow-xl">
+                <div className="text-4xl mb-4">💡</div>
+                <h3 className="text-xl font-black text-blue-900 mb-2">Our Solution</h3>
+                <p className="text-blue-800/80 font-medium">
+                  We teach industry tools, real projects, and career skills —
+                  live, with mentors who have worked at top companies.
+                </p>
+              </div>
+
+              <div className="bg-green-50 p-8 rounded-3xl border-b-4 border-green-200 text-left">
+                <div className="text-4xl mb-4">🚀</div>
+                <h3 className="text-xl font-black text-green-900 mb-2">The Result</h3>
+                <p className="text-green-800/80 font-medium">
+                  Stronger resume, higher salary packages, and the confidence
+                  to crack any interview.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Banners */}
+        {banners.length > 0 && <BannerCarousel banners={banners} onBannerClick={handleBannerClick} />}
+
+        {/* Section 3: Courses */}
+        <section id="pro-courses-section" className="py-20 container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-3">Our Courses</h2>
+            <p className="text-lg md:text-xl text-gray-600">
+              Pick the path that matches your career goals!
+            </p>
+          </div>
+
+          {courses.length === 0 ? (
+            <p className="text-center text-gray-400 py-12 text-lg">Courses coming soon — stay tuned!</p>
+          ) : (
+            <div className="grid lg:grid-cols-3 gap-8">
+              {courses.map((course) => (
+                <div key={course._id} className="bg-white rounded-[2.5rem] overflow-hidden border border-blue-100 shadow-sm flex flex-col">
+                  <div className={`h-40 w-full flex items-center justify-center text-5xl ${course.color || "bg-blue-600"}`}>
+                    {course.badge || "📘"}
+                  </div>
+                  <div className="p-8 flex-1 flex flex-col">
+                    <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">
+                      {course.level}
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-900 mb-2">{course.title}</h3>
+                    {course.subtitle && (
+                      <p className="text-sm font-medium text-blue-500 mb-2">{course.subtitle}</p>
+                    )}
+                    <p className="text-sm text-gray-600 mb-4 flex-1 line-clamp-3">{course.description}</p>
+                    <ul className="space-y-1 text-sm text-gray-700 mb-4">
+                      {course.instructor && (
+                        <li><span className="font-semibold">Instructor:</span> {course.instructor}</li>
+                      )}
+                      {course.duration && (
+                        <li><span className="font-semibold">Duration:</span> {course.duration}</li>
+                      )}
+                      {course.totalLessons > 0 && (
+                        <li><span className="font-semibold">Lessons:</span> {course.totalLessons}</li>
+                      )}
+                      {course.nextDemoSession && (
+                        <li className="text-blue-600 font-semibold">
+                          Next Demo: {new Date(course.nextDemoSession.date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          {" "}&middot; {(() => { const [h,m] = course.nextDemoSession.time.split(":").map(Number); const s = h >= 12 ? "PM" : "AM"; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2,"0")} ${s}`; })()}
+                        </li>
+                      )}
+                    </ul>
+                    <button
+                      onClick={() => handleCourseBookDemo(course)}
+                      className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                        course.nextDemoSession
+                          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      {course.nextDemoSession ? "Book a Demo" : "No Demo Scheduled"}
+                    </button>
+                    {noDemoMsg[course._id] && (
+                      <p className="mt-2 text-xs text-red-500 font-medium text-center">
+                        Demo not scheduled for this course yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Section 4: Learning Tracks */}
+        <section className="py-20 container mx-auto px-4">
+          <h2 className="text-4xl font-black text-center mb-16 text-slate-900">
+            Learning Tracks for Every Stage
+          </h2>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="bg-blue-50 rounded-[2.5rem] p-8 border border-blue-100 relative overflow-hidden group hover:shadow-xl transition-all">
+              <div className="absolute top-0 right-0 bg-blue-400 text-white font-black px-6 py-2 rounded-bl-2xl">
+                Fresher
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 mt-4">Career Starter</h3>
+              <div className="text-blue-600 font-bold mb-6 uppercase tracking-wider text-xs">
+                Foundation & Skills
+              </div>
+              <p className="text-gray-600 mb-8 font-medium">
+                Build core technical and soft skills from scratch. Perfect for
+                college students and fresh graduates entering the job market.
+              </p>
+              <div className="bg-white rounded-2xl p-4 flex gap-3 items-center">
+                <span className="text-2xl">🛠️</span>
+                <span className="font-bold text-sm text-gray-700">Hands-on Projects</span>
+              </div>
+            </div>
+
+            <div className="bg-indigo-50 rounded-[2.5rem] p-8 border border-indigo-100 relative overflow-hidden group hover:shadow-xl transition-all transform lg:-translate-y-4">
+              <div className="absolute top-0 right-0 bg-indigo-600 text-white font-black px-6 py-2 rounded-bl-2xl">
+                1–3 Years
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 mt-4">Growth Track</h3>
+              <div className="text-indigo-600 font-bold mb-6 uppercase tracking-wider text-xs">
+                Upskill & Promote
+              </div>
+              <p className="text-gray-600 mb-8 font-medium">
+                Sharpen your specialization, learn leadership basics, and build
+                a portfolio that speaks louder than your resume.
+              </p>
+              <div className="bg-white rounded-2xl p-4 flex gap-3 items-center">
+                <span className="text-2xl">📈</span>
+                <span className="font-bold text-sm text-gray-700">Career Mentorship</span>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 rounded-[2.5rem] p-8 border border-blue-100 relative overflow-hidden group hover:shadow-xl transition-all">
+              <div className="absolute top-0 right-0 bg-blue-600 text-white font-black px-6 py-2 rounded-bl-2xl">
+                3+ Years
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 mt-4">Leadership Track</h3>
+              <div className="text-blue-600 font-bold mb-6 uppercase tracking-wider text-xs">
+                Lead & Scale
+              </div>
+              <p className="text-gray-600 mb-8 font-medium">
+                Strategy, team management, executive presence, and advanced
+                domain expertise to reach the C-Suite faster.
+              </p>
+              <div className="bg-white rounded-2xl p-4 flex gap-3 items-center">
+                <span className="text-2xl">🏆</span>
+                <span className="font-bold text-sm text-gray-700">Executive Coaching</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 5: Secret Sauce */}
+        <section className="bg-[#1e293b] py-20 text-white rounded-[3rem] mx-4 my-8">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <span className="text-blue-400 font-bold uppercase tracking-widest text-sm mb-2 block">
+                The AcadLearn Pro Edge
+              </span>
+              <h2 className="text-4xl font-black">Our Secret Sauce</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                  🧑‍🏫
+                </div>
+                <h4 className="font-bold text-lg mb-2">Industry Mentors</h4>
+                <p className="text-slate-400 text-sm">
+                  Every batch is taught by professionals with 5+ years of real
+                  industry experience.
+                </p>
+              </div>
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                  📁
+                </div>
+                <h4 className="font-bold text-lg mb-2">Live Projects</h4>
+                <p className="text-slate-400 text-sm">
+                  Build real portfolio projects employers care about. Not just
+                  theory, but production-ready work.
+                </p>
+              </div>
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                  🎯
+                </div>
+                <h4 className="font-bold text-lg mb-2">Placement Support</h4>
+                <p className="text-slate-400 text-sm">
+                  Resume reviews, mock interviews, and direct referrals to our
+                  hiring partner network.
+                </p>
+              </div>
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                  🔄
+                </div>
+                <h4 className="font-bold text-lg mb-2">Lifetime Access</h4>
+                <p className="text-slate-400 text-sm">
+                  Course recordings, updated materials, and the alumni
+                  community are yours forever.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 6: Project Gallery */}
+        <section className="py-20 overflow-hidden">
+          <div className="container mx-auto px-4 mb-12 flex justify-between items-end">
+            <h2 className="text-4xl font-black text-slate-900 max-w-lg">
+              See What Our Learners are{" "}
+              <span className="text-blue-600">Building!</span>
+            </h2>
+            <div className="hidden md:flex gap-2">
+              <button className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">←</button>
+              <button className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700">→</button>
+            </div>
+          </div>
+
+          <div className="flex gap-6 overflow-x-auto pb-8 px-4 pl-4 md:pl-[calc((100vw-1280px)/2)] scrollbar-hide">
+            {[
+              { icon: "📊", title: "Sales Dashboard", by: "Built by Riya (Marketing Manager)", tags: [{ label: "Python", color: "bg-blue-50 text-blue-600" }, { label: "Analytics", color: "bg-indigo-50 text-indigo-600" }] },
+              { icon: "🛒", title: "E-Commerce App", by: "Built by Arjun (CS Final Year)", tags: [{ label: "React", color: "bg-cyan-50 text-cyan-600" }, { label: "Node.js", color: "bg-green-50 text-green-600" }] },
+              { icon: "📱", title: "Portfolio Website", by: "Built by Meera (Fresher)", tags: [{ label: "UI/UX", color: "bg-pink-50 text-pink-600" }, { label: "Figma", color: "bg-purple-50 text-purple-600" }] },
+              { icon: "🤖", title: "ML Price Predictor", by: "Built by Karan (Data Analyst)", tags: [{ label: "ML", color: "bg-orange-50 text-orange-600" }, { label: "Scikit", color: "bg-yellow-50 text-yellow-600" }] },
+            ].map((item, i) => (
+              <div key={i} className="min-w-75 md:min-w-100 bg-white rounded-3xl p-6 border border-gray-100 shadow-lg">
+                <div className="aspect-video bg-gray-100 rounded-2xl mb-6 relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-4xl">{item.icon}</div>
+                </div>
+                <h3 className="font-black text-xl mb-1">{item.title}</h3>
+                <p className="text-gray-500 mb-4">{item.by}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {item.tags.map((t, j) => (
+                    <span key={j} className={`px-3 py-1 text-xs font-bold rounded-full ${t.color}`}>{t.label}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 7: Testimonials */}
+        <section className="bg-blue-50 py-24">
+          <div className="container mx-auto px-4 text-center max-w-4xl">
+            <h2 className="text-3xl font-black mb-16 text-slate-900">
+              Trusted by 10,000+ Working Professionals
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white p-8 rounded-3xl shadow-sm text-left relative">
+                <div className="text-6xl text-blue-200 absolute top-4 left-4">"</div>
+                <p className="text-gray-700 italic mb-6 relative z-10 pt-4">
+                  "I was a marketing executive with no data skills. After AcadLearn
+                  Pro's Python course, I got promoted to Data Analyst in 3 months.
+                  The live projects made all the difference!"
+                </p>
+                <div className="font-bold text-slate-900">— Neha S., Marketing → Data Analyst</div>
+              </div>
+              <div className="bg-white p-8 rounded-3xl shadow-sm text-left relative">
+                <div className="text-6xl text-blue-200 absolute top-4 left-4">"</div>
+                <p className="text-gray-700 italic mb-6 relative z-10 pt-4">
+                  "As a CS fresher, I had the theory but no projects. AcadLearn Pro
+                  helped me build a full-stack app that got me my first job offer."
+                </p>
+                <div className="font-bold text-slate-900">— Rahul M., Fresher → SDE at Startup</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 8: Footer CTA */}
+        <section className="py-20 bg-slate-900 text-center text-white">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              Give your career the AcadLearn Edge.
+            </h2>
+            <p className="text-xl text-slate-400 mb-10">
+              Join 500+ professionals enrolling this month. Free demo available.
+            </p>
+            <button
+              onClick={handleEnroll}
+              className="px-10 py-5 bg-blue-600 text-white rounded-full font-bold text-xl shadow-lg shadow-blue-900/50 hover:bg-blue-700 hover:scale-105 transition-all mb-12"
+            >
+              Reserve My Free Demo Now
+            </button>
+
+            <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-sm font-bold text-slate-500 border-t border-slate-800 pt-12">
+              <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+              <Link to="/contact" className="hover:text-white transition-colors">Contact Support</Link>
+            </div>
+            <div className="mt-8 text-xs text-slate-700">
+              © 2026 AcadLearn Pro. All rights reserved.
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      {/* Book Demo Modal — triggered when banner with linked class is clicked */}
+      {bannerDemo && (
+        <BookDemoModal
+          cls={bannerDemo}
+          user={user}
+          onClose={() => setBannerDemo(null)}
+        />
+      )}
+
+      {/* Book Demo Modal — triggered when course card "Book a Demo" is clicked */}
+      {courseDemo && (
+        <BookDemoModal
+          cls={courseDemo}
+          user={user}
+          onClose={() => setCourseDemo(null)}
+        />
+      )}
     </div>
-
-    <div className="p-6 flex-1 flex flex-col">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex text-yellow-400 text-xs">
-          {"★".repeat(Math.floor(Number(rating)))}
-        </div>
-        <span className="text-xs font-bold text-slate-800 bg-yellow-100 px-1.5 rounded">
-          {rating}
-        </span>
-      </div>
-
-      <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
-        {title}
-      </h3>
-      <p className="text-sm text-gray-500 mb-4 line-clamp-2">{desc}</p>
-
-      <div className="flex flex-wrap gap-2 mb-6 mt-auto">
-        {tags.map((tag, i) => (
-          <span
-            key={i}
-            className="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
-        <div>
-          <span className="text-xs text-gray-400 block">Price</span>
-          <span className="text-lg font-bold text-gray-900">{price}</span>
-        </div>
-        <button
-          onClick={onEnroll || (() => {})}
-          className="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700 transition-colors"
-        >
-          Enroll Now
-        </button>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 export default ProfessionalHome;

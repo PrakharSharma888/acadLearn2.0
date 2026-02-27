@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import API_BASE from "../config/api";
 
 const initialState = {
-  parentName: "",
-  phone: "",
-  email: "",
-  studentName: "",
+  parentName:         "",
+  phone:              "",
+  email:              "",
+  studentName:        "",
+  college:            "",
+  selectedDepartment: "",
 };
 
 // ── Theme tokens by category ─────────────────────────────────────────────────
@@ -48,12 +50,15 @@ const BookDemoModal = ({ cls, user, onClose }) => {
 
   // Pre-fill from logged-in user each time modal opens
   useEffect(() => {
+    const depts = cls?.targetDepartments || [];
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
-      email:      user?.email || "",
-      parentName: user?.name  || "",
+      email:              user?.email || "",
+      parentName:         user?.name  || "",
+      college:            cls?.universityName || "",
+      selectedDepartment: depts.length === 1 ? depts[0] : "",
     });
   }, [cls, user]);
 
@@ -99,8 +104,10 @@ const BookDemoModal = ({ cls, user, onClose }) => {
         body: JSON.stringify({
           ...formData,
           grade,
-          classId:   cls?._id   || null,
-          className: cls?.title || "",
+          classId:            cls?._id   || null,
+          className:          cls?.title || "",
+          college:            formData.college,
+          selectedDepartment: formData.selectedDepartment,
         }),
       });
       if (!res.ok) {
@@ -117,12 +124,15 @@ const BookDemoModal = ({ cls, user, onClose }) => {
 
   // Reset form so user can book again without closing modal
   const handleBookAnother = () => {
+    const depts = cls?.targetDepartments || [];
     setSuccess(false);
     setErrors({});
     setFormData({
       ...initialState,
-      email:      user?.email || "",
-      parentName: user?.name  || "",
+      email:              user?.email || "",
+      parentName:         user?.name  || "",
+      college:            cls?.universityName || "",
+      selectedDepartment: depts.length === 1 ? depts[0] : "",
     });
   };
 
@@ -187,6 +197,32 @@ const BookDemoModal = ({ cls, user, onClose }) => {
           </div>
         </div>
 
+        {/* ── Course details (read-only) — shown when banner has department/slug info ── */}
+        {(cls?.department || cls?.classSlug) && (
+          <div className="px-6 pt-4 pb-2">
+            <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-wrap gap-2 items-center">
+              <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mr-1">Course Info</span>
+              {cls?.classSlug && (
+                <span className="flex items-center gap-1 text-[11px] font-mono bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-lg">
+                  <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                  </svg>
+                  {cls.classSlug}
+                </span>
+              )}
+              {cls?.department && (
+                <span className="flex items-center gap-1 text-[11px] font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 px-2.5 py-1 rounded-lg">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  {cls.department}
+                </span>
+              )}
+              <span className="text-[10px] text-gray-400 italic ml-auto">read-only</span>
+            </div>
+          </div>
+        )}
+
         {/* ── Success state ── */}
         {success ? (
           <div className="p-8 text-center">
@@ -240,6 +276,71 @@ const BookDemoModal = ({ cls, user, onClose }) => {
                 </div>
               </div>
             )}
+
+            {/* ── College field ── */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
+                College / University
+              </label>
+              {cls?.universityName ? (
+                <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-3.5 py-2.5">
+                  <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <span className="text-sm font-semibold text-indigo-700">{cls.universityName}</span>
+                  <span className="ml-auto text-[10px] text-indigo-500 font-semibold bg-indigo-100 px-2 py-0.5 rounded-full">Verified</span>
+                </div>
+              ) : (
+                <input
+                  name="college"
+                  type="text"
+                  value={formData.college}
+                  onChange={handleChange}
+                  placeholder="Enter your college or university name"
+                  className={inputCls("college")}
+                />
+              )}
+            </div>
+
+            {/* ── Department field — only if banner has departments ── */}
+            {(() => {
+              const depts = cls?.targetDepartments || [];
+              if (depts.length === 0) return null;
+              if (depts.length === 1) {
+                return (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                      Department
+                    </label>
+                    <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-3.5 py-2.5">
+                      <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm font-semibold text-indigo-700">{depts[0]}</span>
+                      <span className="ml-auto text-[10px] text-indigo-400 italic">auto-selected</span>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    Department
+                  </label>
+                  <select
+                    name="selectedDepartment"
+                    value={formData.selectedDepartment}
+                    onChange={handleChange}
+                    className={inputCls("selectedDepartment")}
+                  >
+                    <option value="">— Select your department —</option>
+                    {depts.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              );
+            })()}
 
             {FIELDS.map((field) => (
               <div key={field.name}>

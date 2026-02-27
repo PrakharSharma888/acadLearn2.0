@@ -1,17 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import API_BASE from "../config/api";
 import JuniorHeroImg from "../assets/junior-hero.png";
 import Logo from "../assets/logo.jpeg";
 import JuniorNavbar from "../components/JuniorNavbar";
+import BannerCarousel from "../components/BannerCarousel";
+import BookDemoModal from "../components/BookDemoModal";
 import CourseImg1 from "../assets/course1.png";
 import CourseImg2 from "../assets/course2.png";
 import CourseImg3 from "../assets/course3.png";
 
 const JuniorHome = () => {
   const navigate = useNavigate();
+  const [banners, setBanners]               = useState([]);
+  const [bannerDemo, setBannerDemo]         = useState(null); // banner clicked for Book Demo
+  const [user, setUser]                     = useState(null);
+  const [juniorDemoAvailable, setJuniorDemoAvailable] = useState(false);
+  const [showNoDemoNote, setShowNoDemoNote] = useState(false);
+
+  useEffect(() => {
+    const info = localStorage.getItem("userInfo");
+    if (info) setUser(JSON.parse(info));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/banners?page=junior`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setBanners(data))
+      .catch(() => {});
+  }, []);
+
+  // Check if any upcoming junior/all demo sessions exist
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    fetch(`${API_BASE}/api/demo-sessions`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((sessions) => {
+        const has = sessions.some(
+          (s) => s.isActive && s.date >= today && (s.category === "junior" || s.category === "all")
+        );
+        setJuniorDemoAvailable(has);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Banner click: if banner has a linked class, open BookDemoModal with pre-filled info
+  const handleBannerClick = (banner) => {
+    if (banner.classId) {
+      setBannerDemo({
+        _id:               banner.classId,
+        title:             banner.className || banner.title,
+        category:          banner.category || "junior",
+        classSlug:         banner.classSlug,
+        department:        banner.department,
+        universityName:    banner.universityName    || "",
+        targetDepartments: banner.targetDepartments || [],
+      });
+    } else if (banner.link) {
+      window.open(banner.link, "_blank", "noopener,noreferrer");
+    }
+    // else: no action for banners without classId or link
+  };
 
   const handleBookDemo = () => {
-    // navigate("/book-demo");
+    if (!juniorDemoAvailable) {
+      setShowNoDemoNote(true);
+      setTimeout(() => setShowNoDemoNote(false), 3000);
+      return;
+    }
     navigate("/login");
   };
 
@@ -128,6 +184,9 @@ const JuniorHome = () => {
           </div>
         </section>
 
+        {/* Banners */}
+        {banners.length > 0 && <BannerCarousel banners={banners} onBannerClick={handleBannerClick} />}
+
         {/* Section 3: Our Courses (Junior paths) */}
         <section
           id="junior-courses-section"
@@ -141,6 +200,16 @@ const JuniorHome = () => {
               Pick your path to a brighter future!
             </p>
           </div>
+
+          {/* No-demo note — shown for 3s when a disabled button is clicked */}
+          {showNoDemoNote && (
+            <div className="mb-6 mx-auto max-w-md bg-red-50 border border-red-200 rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-red-600 font-semibold shadow-sm">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Demo not scheduled for this course yet. Please check back soon!
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Course 1: After-School Excellence */}
@@ -183,9 +252,13 @@ const JuniorHome = () => {
               </ul>
               <button
                 onClick={handleBookDemo}
-                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                  juniorDemoAvailable
+                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                Book a Demo
+                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
               </button>
               </div>
             </div>
@@ -225,9 +298,13 @@ const JuniorHome = () => {
               </ul>
               <button
                 onClick={handleBookDemo}
-                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                  juniorDemoAvailable
+                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                Book a Demo
+                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
               </button>
               </div>
             </div>
@@ -266,9 +343,13 @@ const JuniorHome = () => {
               </ul>
               <button
                 onClick={handleBookDemo}
-                className="mt-2 inline-flex justify-center rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
+                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                  juniorDemoAvailable
+                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                Book a Demo
+                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
               </button>
               </div>
             </div>
@@ -567,6 +648,15 @@ const JuniorHome = () => {
           </div>
         </section>
       </main>
+
+      {/* Book Demo Modal — triggered when banner with linked class is clicked */}
+      {bannerDemo && (
+        <BookDemoModal
+          cls={bannerDemo}
+          user={user}
+          onClose={() => setBannerDemo(null)}
+        />
+      )}
     </div>
   );
 };

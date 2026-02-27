@@ -1,13 +1,36 @@
-const Class = require("../models/Class");
+const Class        = require("../models/Class");
+const DemoSession  = require("../models/DemoSession");
 
 // GET /api/classes  — optionally filter by ?category=junior|professional
+// Each class gets a `nextDemoSession` field (nearest upcoming session, or null)
 exports.getClasses = async (req, res) => {
   try {
     const filter = { isActive: true };
     if (req.query.category) filter.category = req.query.category;
 
-    const classes = await Class.find(filter).sort({ createdAt: -1 });
-    res.status(200).json(classes);
+    const today   = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const [classes, sessions] = await Promise.all([
+      Class.find(filter).sort({ createdAt: -1 }).lean(),
+      DemoSession.find({ isActive: true, date: { $gte: today } }).lean(),
+    ]);
+
+    // Build map: classId (string) → earliest upcoming session
+    const sessionMap = {};
+    sessions.forEach((s) => {
+      const id = s.classId?.toString();
+      if (!id) return;
+      const existing = sessionMap[id];
+      if (!existing || s.date < existing.date || (s.date === existing.date && s.time < existing.time)) {
+        sessionMap[id] = { date: s.date, time: s.time, title: s.title, _id: s._id };
+      }
+    });
+
+    const result = classes.map((c) => ({
+      ...c,
+      nextDemoSession: sessionMap[c._id.toString()] || null,
+    }));
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Server error. Please try again." });
   }

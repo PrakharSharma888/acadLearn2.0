@@ -146,8 +146,12 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
   const [filter,         setFilter]         = useState("all");
   const [activeBooking,  setActiveBooking]  = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [bookingPage,    setBookingPage]    = useState(0);
+  const BOOKING_PAGE_SIZE = 10;
 
   const shown   = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+  const pagedBookings = shown.slice(bookingPage * BOOKING_PAGE_SIZE, (bookingPage + 1) * BOOKING_PAGE_SIZE);
+  const bookingTotalPages = Math.ceil(shown.length / BOOKING_PAGE_SIZE);
   const isAdmin = user?.role === "admin";
 
   // All upcoming sessions (today or future), sorted soonest first
@@ -545,7 +549,7 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
           {FILTERS.map((s) => (
             <button
               key={s}
-              onClick={() => setFilter(s)}
+              onClick={() => { setFilter(s); setBookingPage(0); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
                 filter === s ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-slate-700"
               }`}
@@ -578,8 +582,9 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
           )}
 
           {!loading && shown.length > 0 && (
+            <>
             <div className="space-y-3">
-              {shown.map((b) => (
+              {pagedBookings.map((b) => (
             <div key={b._id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                 {/* Icon */}
@@ -597,6 +602,25 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                     {b.grade ? ` · ${b.grade}` : ""}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">Booked on {fmtDate(b.createdAt)}</p>
+
+                  {/* College + Department (shown when present) */}
+                  {(b.college || b.selectedDepartment) && (
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                      {b.college && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          {b.college}
+                        </span>
+                      )}
+                      {b.selectedDepartment && (
+                        <span className="text-[11px] font-semibold bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full">
+                          {b.selectedDepartment}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Admin: contact summary */}
                   {isAdmin && (
@@ -655,7 +679,44 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
             </div>
           ))}
         </div>
-      )}
+          {/* Pagination */}
+          {bookingTotalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                Showing {bookingPage * BOOKING_PAGE_SIZE + 1}–{Math.min((bookingPage + 1) * BOOKING_PAGE_SIZE, shown.length)} of {shown.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setBookingPage((p) => p - 1)}
+                  disabled={bookingPage === 0}
+                  className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Prev
+                </button>
+                {Array.from({ length: bookingTotalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setBookingPage(i)}
+                    className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${
+                      bookingPage === i ? "bg-orange-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setBookingPage((p) => p + 1)}
+                  disabled={bookingPage >= bookingTotalPages - 1}
+                  className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+            </>
+          )}
         </div>
 
         {/* Calendar (Students only) */}
