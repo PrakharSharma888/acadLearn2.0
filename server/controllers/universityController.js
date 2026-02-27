@@ -3,7 +3,7 @@ const University = require("../models/University");
 // GET /api/universities/slug/:slug — fetch single university by slug (public)
 exports.getUniversityBySlug = async (req, res) => {
   try {
-    const university = await University.findOne({ slug: req.params.slug, isActive: true });
+    const university = await University.findOne({ slug: req.params.slug });
     if (!university) return res.status(404).json({ message: "Organization not found" });
     res.json(university);
   } catch {
@@ -33,12 +33,22 @@ exports.getAllUniversities = async (req, res) => {
 
 // POST /api/universities — create university (admin only)
 exports.createUniversity = async (req, res) => {
-  const { name, shortName } = req.body;
+  const { name, shortName, slug, logoUrl } = req.body;
   if (!name) return res.status(400).json({ message: "University name is required" });
   try {
     const exists = await University.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
     if (exists) return res.status(400).json({ message: "University already exists" });
-    const university = await University.create({ name, shortName: shortName || "" });
+    // Check slug conflict
+    if (slug) {
+      const slugConflict = await University.findOne({ slug });
+      if (slugConflict) return res.status(400).json({ message: "This URL slug is already taken" });
+    }
+    const university = await University.create({
+      name,
+      shortName: shortName || "",
+      slug:      slug     || "",
+      logoUrl:   logoUrl  || "",
+    });
     res.status(201).json(university);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
