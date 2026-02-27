@@ -19,6 +19,7 @@ import BookDemo from "./pages/BookDemo";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ApplyFullCourse from "./pages/ApplyFullCourse";
+import OrgPage from "./pages/OrgPage";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/course/play/:id" element={<CoursePlayer />} />
         <Route path="/checkout/:courseId?" element={<Checkout />} />
         <Route path="/apply/:id" element={<ApplyFullCourse />} />
+        <Route path="/org/:slug" element={<OrgPage />} />
       </Routes>
     </Router>
   );
