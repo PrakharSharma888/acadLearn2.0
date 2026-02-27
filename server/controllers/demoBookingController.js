@@ -48,7 +48,10 @@ exports.bookDemo = async (req, res) => {
 // GET /api/demo-booking  — all bookings (admin only)
 exports.getBookings = async (req, res) => {
   try {
-    const bookings = await DemoBooking.find().sort({ createdAt: -1 }).populate("classId", "title category");
+    const bookings = await DemoBooking.find()
+      .sort({ createdAt: -1 })
+      .populate("classId", "title category")
+      .populate("userId", "universityName department year semester");
     res.status(200).json(bookings);
   } catch {
     res.status(500).json({ message: "Server error. Please try again." });
@@ -59,10 +62,15 @@ exports.getBookings = async (req, res) => {
 exports.getMyBookings = async (req, res) => {
   try {
     if (req.user.role === "admin") {
-      const all = await DemoBooking.find().sort({ createdAt: -1 }).populate("classId", "title category");
+      const all = await DemoBooking.find()
+        .sort({ createdAt: -1 })
+        .populate("classId", "title category")
+        .populate("userId", "universityName department year semester");
       return res.status(200).json(all);
     }
-    const bookings = await DemoBooking.find({ userId: req.user._id }).sort({ createdAt: -1 }).populate("classId", "title category");
+    const bookings = await DemoBooking.find({ userId: req.user._id })
+      .sort({ createdAt: -1 })
+      .populate("classId", "title category");
     res.status(200).json(bookings);
   } catch {
     res.status(500).json({ message: "Server error. Please try again." });

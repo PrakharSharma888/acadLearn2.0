@@ -84,6 +84,19 @@ const ActionModal = ({ booking, onClose, onSave }) => {
             {booking.selectedDepartment && (
               <p><span className="font-semibold text-slate-600">Department:</span> {booking.selectedDepartment}</p>
             )}
+            {/* Academic info from student's profile */}
+            {booking.userId?.universityName && (
+              <p><span className="font-semibold text-slate-600">University:</span> {booking.userId.universityName}</p>
+            )}
+            {booking.userId?.department && (
+              <p><span className="font-semibold text-slate-600">Dept (Profile):</span> {booking.userId.department}</p>
+            )}
+            {(booking.userId?.year || booking.userId?.semester) && (
+              <p>
+                <span className="font-semibold text-slate-600">Batch:</span>{" "}
+                {[booking.userId.year, booking.userId.semester].filter(Boolean).join(" · ")}
+              </p>
+            )}
             <p><span className="font-semibold text-slate-600">Booked:</span> {fmtDate(booking.createdAt)}</p>
           </div>
 
@@ -637,6 +650,30 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                     <p className="text-xs text-gray-400 mt-0.5">
                       {b.email} · {b.phone || "N/A"} · {b.parentName}
                     </p>
+                  )}
+
+                  {/* Admin: university / batch from student profile */}
+                  {isAdmin && (b.userId?.universityName || b.userId?.year || b.userId?.semester) && (
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                      {b.userId.universityName && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-blue-50 border border-blue-200 text-blue-700 px-2 py-0.5 rounded-full">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          {b.userId.universityName}
+                        </span>
+                      )}
+                      {b.userId.department && (
+                        <span className="text-[11px] font-semibold bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full">
+                          {b.userId.department}
+                        </span>
+                      )}
+                      {(b.userId.year || b.userId.semester) && (
+                        <span className="text-[11px] font-semibold bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full">
+                          {[b.userId.year, b.userId.semester].filter(Boolean).join(" · ")}
+                        </span>
+                      )}
+                    </div>
                   )}
 
                   {/* User: show scheduled date+time if confirmed */}
