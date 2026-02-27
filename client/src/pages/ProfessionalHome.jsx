@@ -150,6 +150,7 @@ const ProfessionalHome = () => {
         category:          banner.category || "professional",
         classSlug:         banner.classSlug,
         department:        banner.department,
+        universityId:      banner.universityId      || "",
         universityName:    banner.universityName    || "",
         targetDepartments: banner.targetDepartments || [],
       });

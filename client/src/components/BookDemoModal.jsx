@@ -104,8 +104,9 @@ const BookDemoModal = ({ cls, user, onClose }) => {
         body: JSON.stringify({
           ...formData,
           grade,
-          classId:            cls?._id   || null,
-          className:          cls?.title || "",
+          classId:            cls?._id          || null,
+          className:          cls?.title        || "",
+          universityId:       cls?.universityId || "",
           college:            formData.college,
           selectedDepartment: formData.selectedDepartment,
         }),

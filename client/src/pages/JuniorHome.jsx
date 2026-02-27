@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API_BASE from "../config/api";
 import JuniorHeroImg from "../assets/junior-hero.png";
@@ -6,17 +6,15 @@ import Logo from "../assets/logo.jpeg";
 import JuniorNavbar from "../components/JuniorNavbar";
 import BannerCarousel from "../components/BannerCarousel";
 import BookDemoModal from "../components/BookDemoModal";
-import CourseImg1 from "../assets/course1.png";
-import CourseImg2 from "../assets/course2.png";
-import CourseImg3 from "../assets/course3.png";
 
 const JuniorHome = () => {
   const navigate = useNavigate();
-  const [banners, setBanners]               = useState([]);
-  const [bannerDemo, setBannerDemo]         = useState(null); // banner clicked for Book Demo
-  const [user, setUser]                     = useState(null);
-  const [juniorDemoAvailable, setJuniorDemoAvailable] = useState(false);
-  const [showNoDemoNote, setShowNoDemoNote] = useState(false);
+  const [banners, setBanners]       = useState([]);
+  const [bannerDemo, setBannerDemo] = useState(null);
+  const [courseDemo, setCourseDemo] = useState(null);
+  const [user, setUser]             = useState(null);
+  const [courses, setCourses]       = useState([]);
+  const [noDemoMsg, setNoDemoMsg]   = useState({});
 
   useEffect(() => {
     const info = localStorage.getItem("userInfo");
@@ -30,19 +28,18 @@ const JuniorHome = () => {
       .catch(() => {});
   }, []);
 
-  // Check if any upcoming junior/all demo sessions exist
-  useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    fetch(`${API_BASE}/api/demo-sessions`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((sessions) => {
-        const has = sessions.some(
-          (s) => s.isActive && s.date >= today && (s.category === "junior" || s.category === "all")
-        );
-        setJuniorDemoAvailable(has);
-      })
-      .catch(() => {});
+  // Load junior courses from DB — each has its own nextDemoSession
+  const loadCourses = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/classes?category=junior`);
+      if (res.ok) {
+        const all = await res.json();
+        setCourses(all.filter((c) => c.isActive));
+      }
+    } catch { /* silent */ }
   }, []);
+
+  useEffect(() => { loadCourses(); }, [loadCourses]);
 
   // Banner click: if banner has a linked class, open BookDemoModal with pre-filled info
   const handleBannerClick = (banner) => {
@@ -53,6 +50,7 @@ const JuniorHome = () => {
         category:          banner.category || "junior",
         classSlug:         banner.classSlug,
         department:        banner.department,
+        universityId:      banner.universityId      || "",
         universityName:    banner.universityName    || "",
         targetDepartments: banner.targetDepartments || [],
       });
@@ -63,12 +61,18 @@ const JuniorHome = () => {
   };
 
   const handleBookDemo = () => {
-    if (!juniorDemoAvailable) {
-      setShowNoDemoNote(true);
-      setTimeout(() => setShowNoDemoNote(false), 3000);
+    const el = document.getElementById("junior-courses-section");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleCourseBookDemo = (course) => {
+    if (!course.nextDemoSession) {
+      setNoDemoMsg((prev) => ({ ...prev, [course._id]: true }));
+      setTimeout(() => setNoDemoMsg((prev) => ({ ...prev, [course._id]: false })), 3000);
       return;
     }
-    navigate("/login");
+    if (!user) { navigate("/login"); return; }
+    setCourseDemo(course);
   };
 
   const handleWatchVideo = () => {
@@ -201,159 +205,58 @@ const JuniorHome = () => {
             </p>
           </div>
 
-          {/* No-demo note — shown for 3s when a disabled button is clicked */}
-          {showNoDemoNote && (
-            <div className="mb-6 mx-auto max-w-md bg-red-50 border border-red-200 rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-red-600 font-semibold shadow-sm">
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Demo not scheduled for this course yet. Please check back soon!
+          {courses.length === 0 ? (
+            <p className="text-center text-gray-400 py-12 text-lg">Courses coming soon — stay tuned!</p>
+          ) : (
+            <div className="grid lg:grid-cols-3 gap-8">
+              {courses.map((course) => (
+                <div key={course._id} className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
+                  <div className={`h-40 w-full flex items-center justify-center text-5xl ${course.color || "bg-orange-400"}`}>
+                    {course.badge || "📚"}
+                  </div>
+                  <div className="p-8 flex-1 flex flex-col">
+                    <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
+                      {course.level}
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-900 mb-2">{course.title}</h3>
+                    {course.subtitle && (
+                      <p className="text-sm font-medium text-orange-500 mb-2">{course.subtitle}</p>
+                    )}
+                    <p className="text-sm text-gray-600 mb-4 flex-1 line-clamp-3">{course.description}</p>
+                    <ul className="space-y-1 text-sm text-gray-700 mb-4">
+                      {course.instructor && (
+                        <li><span className="font-semibold">Instructor:</span> {course.instructor}</li>
+                      )}
+                      {course.duration && (
+                        <li><span className="font-semibold">Duration:</span> {course.duration}</li>
+                      )}
+                      {course.nextDemoSession && (
+                        <li className="text-orange-600 font-semibold">
+                          Next Demo: {new Date(course.nextDemoSession.date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          {" "}&middot; {(() => { const [h,m] = course.nextDemoSession.time.split(":").map(Number); const s = h >= 12 ? "PM" : "AM"; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2,"0")} ${s}`; })()}
+                        </li>
+                      )}
+                    </ul>
+                    <button
+                      onClick={() => handleCourseBookDemo(course)}
+                      className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                        course.nextDemoSession
+                          ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      {course.nextDemoSession ? "Book a Demo" : "No Demo Scheduled"}
+                    </button>
+                    {noDemoMsg[course._id] && (
+                      <p className="mt-2 text-xs text-red-500 font-medium text-center">
+                        Demo not scheduled for this course yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Course 1: After-School Excellence */}
-            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
-              <div className="h-40 w-full overflow-hidden">
-                <img
-                  src={CourseImg1}
-                  alt="After-School Excellence"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col">
-              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
-                After-School Excellence
-              </p>
-              <h3 className="text-2xl font-black text-slate-900 mb-2">
-                Total Academic Support
-              </h3>
-              <p className="text-sm text-gray-600 mb-4 flex-1">
-                Give your child the edge they need to lead the class. We provide
-                comprehensive guidance to turn school challenges into daily
-                victories.
-              </p>
-              <ul className="space-y-1 text-sm text-gray-700 mb-4">
-                <li>
-                  <span className="font-semibold">Grades:</span> 1st to 9th
-                </li>
-                <li>
-                  <span className="font-semibold">Duration:</span> 6 Days
-                  Intensive Learning &amp; Support
-                </li>
-                <li>
-                  <span className="font-semibold">Subjects:</span> English,
-                  Maths, Science &amp; Social Studies
-                </li>
-                <li>
-                  <span className="font-semibold">Curriculum:</span> Fully
-                  synced with CBSE, ICSE, and State Boards
-                </li>
-              </ul>
-              <button
-                onClick={handleBookDemo}
-                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                  juniorDemoAvailable
-                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
-              </button>
-              </div>
-            </div>
-
-            {/* Course 2: English Mastery */}
-            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
-              <div className="h-40 w-full overflow-hidden">
-                <img
-                  src={CourseImg2}
-                  alt="English Mastery"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col">
-              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
-                English Mastery
-              </p>
-              <h3 className="text-2xl font-black text-slate-900 mb-2">
-                Global Communication Skills
-              </h3>
-              <p className="text-sm text-gray-600 mb-4 flex-1">
-                Help your child speak with confidence and precision. Our
-                specialized program prepares students for international
-                standards and real-world success.
-              </p>
-              <ul className="space-y-1 text-sm text-gray-700 mb-4">
-                <li>
-                  <span className="font-semibold">Grades:</span> 1st to 9th
-                </li>
-                <li>
-                  <span className="font-semibold">Duration:</span> 6 Days
-                </li>
-                <li>
-                  <span className="font-semibold">Focus:</span> Fluency,
-                  Grammar, and Creative Writing
-                </li>
-              </ul>
-              <button
-                onClick={handleBookDemo}
-                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                  juniorDemoAvailable
-                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
-              </button>
-              </div>
-            </div>
-
-            {/* Course 3: Advanced Mathematics */}
-            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-orange-100 shadow-sm flex flex-col">
-              <div className="h-40 w-full overflow-hidden">
-                <img
-                  src={CourseImg3}
-                  alt="Advanced Mathematics"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col">
-              <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2">
-                Advanced Mathematics
-              </p>
-              <h3 className="text-2xl font-black text-slate-900 mb-2">
-                The Math Genius Program
-              </h3>
-              <p className="text-sm text-gray-600 mb-4 flex-1">
-                Master the language of logic. We teach kids to solve complex
-                problems with lightning speed, making numbers fun and intuitive.
-              </p>
-              <ul className="space-y-1 text-sm text-gray-700 mb-4">
-                <li>
-                  <span className="font-semibold">Grades:</span> 1st to 9th
-                </li>
-                <li>
-                  <span className="font-semibold">Duration:</span> 6 Days
-                </li>
-                <li>
-                  <span className="font-semibold">Focus:</span> Mental Math &
-                  Logical Reasoning
-                </li>
-              </ul>
-              <button
-                onClick={handleBookDemo}
-                className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                  juniorDemoAvailable
-                    ? "bg-orange-500 text-white shadow-md hover:bg-orange-600 hover:shadow-lg"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {juniorDemoAvailable ? "Book a Demo" : "No Demo Scheduled"}
-              </button>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* Section 4: The Learning Tracks */}
@@ -655,6 +558,15 @@ const JuniorHome = () => {
           cls={bannerDemo}
           user={user}
           onClose={() => setBannerDemo(null)}
+        />
+      )}
+
+      {/* Book Demo Modal — triggered when course card "Book a Demo" is clicked */}
+      {courseDemo && (
+        <BookDemoModal
+          cls={courseDemo}
+          user={user}
+          onClose={() => setCourseDemo(null)}
         />
       )}
     </div>

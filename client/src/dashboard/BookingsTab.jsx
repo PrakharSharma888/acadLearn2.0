@@ -72,6 +72,15 @@ const ActionModal = ({ booking, onClose, onSave }) => {
           <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-500 space-y-1">
             <p><span className="font-semibold text-slate-600">Email:</span> {booking.email}</p>
             <p><span className="font-semibold text-slate-600">Phone:</span> {booking.phone || "N/A"}</p>
+            {booking.grade && (
+              <p><span className="font-semibold text-slate-600">Grade:</span> {booking.grade}</p>
+            )}
+            {booking.college && (
+              <p><span className="font-semibold text-slate-600">College:</span> {booking.college}</p>
+            )}
+            {booking.selectedDepartment && (
+              <p><span className="font-semibold text-slate-600">Department:</span> {booking.selectedDepartment}</p>
+            )}
             <p><span className="font-semibold text-slate-600">Booked:</span> {fmtDate(booking.createdAt)}</p>
           </div>
 

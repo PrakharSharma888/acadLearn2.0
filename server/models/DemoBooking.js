@@ -13,6 +13,7 @@ const demoBookingSchema = new mongoose.Schema(
       default: null,
     },
     className:          { type: String, default: "" },
+    universityId:       { type: String, default: "" },   // set only for banner-linked bookings
     college:            { type: String, default: "" },
     selectedDepartment: { type: String, default: "" },
     parentName: { type: String, required: true },
