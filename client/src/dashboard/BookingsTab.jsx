@@ -674,8 +674,8 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                     </button>
                   )}
 
-                  {/* User: cancel button */}
-                  {!isAdmin && (b.status === "pending" || b.status === "confirmed") && (
+                  {/* User: cancel button — only for pending bookings */}
+                  {!isAdmin && b.status === "pending" && (
                     <button
                       onClick={() => onCancel(b._id)}
                       className="text-xs font-semibold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-red-200"
