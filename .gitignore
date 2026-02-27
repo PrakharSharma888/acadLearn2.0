@@ -24,6 +24,6 @@ bun.*
 *.sw?
 
 node_modules
-server/*
+# server/*
 *.md
 # client/node_modules/.vite/deps/_metadata.json
