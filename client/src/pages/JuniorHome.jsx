@@ -72,7 +72,11 @@ const JuniorHome = () => {
       return;
     }
     if (!user) { navigate("/login"); return; }
-    setCourseDemo(course);
+    setCourseDemo({
+      ...course,
+      sessionDate: course.nextDemoSession?.date || "",
+      sessionTime: course.nextDemoSession?.time || "",
+    });
   };
 
   const handleWatchVideo = () => {

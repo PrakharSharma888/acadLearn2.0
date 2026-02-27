@@ -22,6 +22,7 @@ const demoBookingSchema = new mongoose.Schema(
     studentName: { type: String, required: true },
     grade: { type: String, required: true },
     preferredDate: { type: String, default: "" },
+    preferredTime: { type: String, default: "" },
     confirmedDate: { type: String, default: "" },
     confirmedTime: { type: String, default: "" },
     status: {

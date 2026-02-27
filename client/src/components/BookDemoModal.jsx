@@ -107,6 +107,8 @@ const BookDemoModal = ({ cls, user, onClose }) => {
           classId:            cls?._id          || null,
           className:          cls?.title        || "",
           universityId:       cls?.universityId || "",
+          preferredDate:      cls?.sessionDate  || "",
+          preferredTime:      cls?.sessionTime  || "",
           college:            formData.college,
           selectedDepartment: formData.selectedDepartment,
         }),
@@ -278,12 +280,12 @@ const BookDemoModal = ({ cls, user, onClose }) => {
               </div>
             )}
 
-            {/* ── College field ── */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">
-                College / University
-              </label>
-              {cls?.universityName ? (
+            {/* ── College field — only shown for banner-linked (university) bookings ── */}
+            {cls?.universityName && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  College / University
+                </label>
                 <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-3.5 py-2.5">
                   <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -291,17 +293,8 @@ const BookDemoModal = ({ cls, user, onClose }) => {
                   <span className="text-sm font-semibold text-indigo-700">{cls.universityName}</span>
                   <span className="ml-auto text-[10px] text-indigo-500 font-semibold bg-indigo-100 px-2 py-0.5 rounded-full">Verified</span>
                 </div>
-              ) : (
-                <input
-                  name="college"
-                  type="text"
-                  value={formData.college}
-                  onChange={handleChange}
-                  placeholder="Enter your college or university name"
-                  className={inputCls("college")}
-                />
-              )}
-            </div>
+              </div>
+            )}
 
             {/* ── Department field — only if banner has departments ── */}
             {(() => {

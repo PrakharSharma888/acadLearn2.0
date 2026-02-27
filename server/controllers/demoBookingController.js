@@ -3,7 +3,7 @@ const { sendDemoBookingMail } = require("../utils/sendDemoBookingMail");
 
 // POST /api/demo-booking  (protected)
 exports.bookDemo = async (req, res) => {
-  const { classId, className, parentName, phone, email, studentName, grade, college, selectedDepartment, universityId } = req.body;
+  const { classId, className, parentName, phone, email, studentName, grade, college, selectedDepartment, universityId, preferredDate, preferredTime } = req.body;
   if (!parentName || !phone || !email || !studentName || !grade)
     return res.status(400).json({ message: "All required fields must be filled." });
   try {
@@ -26,9 +26,11 @@ exports.bookDemo = async (req, res) => {
       userId:             req.user._id,
       classId:            classId  || null,
       className:          className || "",
-      universityId:       universityId || "",
+      universityId:       universityId  || "",
       college:            college            || "",
       selectedDepartment: selectedDepartment || "",
+      preferredDate:      preferredDate      || "",
+      preferredTime:      preferredTime      || "",
       parentName,
       phone,
       email:              email.toLowerCase(),

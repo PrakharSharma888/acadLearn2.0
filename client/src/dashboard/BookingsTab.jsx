@@ -15,24 +15,27 @@ const daysUntil = (dateStr) => {
 
 // Shape a DemoSession into the object BookDemoModal expects (cls)
 const sessionToCls = (s) => ({
-  _id:        s.classId || s._id,
-  title:      s.title,
-  instructor: s.instructor,
-  category:   s.category === "all" ? "junior" : s.category,
-  type:       s.type,
-  price:      s.price,
+  _id:         s.classId || s._id,
+  title:       s.title,
+  instructor:  s.instructor,
+  category:    s.category === "all" ? "junior" : s.category,
+  type:        s.type,
+  price:       s.price,
+  sessionDate: s.date,   // pass session date so it saves as preferredDate
+  sessionTime: s.time,
 });
 
 // ── Admin Action Modal ────────────────────────────────────────────────────────
 const ActionModal = ({ booking, onClose, onSave }) => {
-  const [status,        setStatus]        = useState(booking.status);
-  const [confirmedDate, setConfirmedDate] = useState(booking.confirmedDate || "");
-  const [confirmedTime, setConfirmedTime] = useState(booking.confirmedTime || "");
-  const [saving,        setSaving]        = useState(false);
+  const [status, setStatus] = useState(booking.status);
+  const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(booking._id, status, confirmedDate, confirmedTime);
+    // Auto-use session's scheduled date/time; fall back to existing confirmed values
+    const date = booking.confirmedDate || booking.preferredDate || "";
+    const time = booking.confirmedTime || booking.preferredTime || "";
+    await onSave(booking._id, status, date, time);
     setSaving(false);
     onClose();
   };
@@ -105,28 +108,19 @@ const ActionModal = ({ booking, onClose, onSave }) => {
             </div>
           </div>
 
-          {/* Date & Time */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-2">
-              Demo Date &amp; Time
-              <span className="ml-1 font-normal text-gray-400">(optional)</span>
-            </label>
-            <div className="flex gap-3">
-              <input
-                type="date"
-                value={confirmedDate}
-                min={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setConfirmedDate(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-              />
-              <input
-                type="time"
-                value={confirmedTime}
-                onChange={(e) => setConfirmedTime(e.target.value)}
-                className="w-32 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-              />
+          {/* Scheduled date/time (read-only — set by the session) */}
+          {(booking.preferredDate || booking.confirmedDate) && (
+            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+              <p className="text-xs font-semibold text-green-700 mb-0.5">Session Date &amp; Time</p>
+              <p className="text-sm font-bold text-green-800">
+                {booking.confirmedDate || booking.preferredDate}
+                {(booking.confirmedTime || booking.preferredTime)
+                  ? ` at ${booking.confirmedTime || booking.preferredTime}`
+                  : ""}
+              </p>
+              <p className="text-[10px] text-green-600 mt-0.5">Auto-filled from the scheduled session</p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -241,18 +235,25 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
   
   const getBookingForDate = (date) => {
     if (!bookings) return null;
-    // Use local date comparison to avoid timezone issues
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    
-    return bookings.find(b => {
-      if (b.status !== 'confirmed' || !b.confirmedDate) return false;
-      const bookingDate = new Date(b.confirmedDate);
-      return bookingDate.getFullYear() === year &&
-             bookingDate.getMonth() === month &&
-             bookingDate.getDate() === day;
-    });
+
+    const matchDate = (dateStr) => {
+      if (!dateStr) return false;
+      const d = new Date(dateStr + "T00:00:00");
+      return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+    };
+
+    // Confirmed booking with admin-set date
+    const confirmed = bookings.find(b => b.status === "confirmed" && matchDate(b.confirmedDate));
+    if (confirmed) return { booking: confirmed, isPending: false };
+
+    // Pending booking with student's preferred/session date
+    const pending = bookings.find(b => b.status === "pending" && matchDate(b.preferredDate));
+    if (pending) return { booking: pending, isPending: true };
+
+    return null;
   };
 
   const getDaysInMonth = (date) => {
@@ -793,8 +794,9 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                     for (let day = 1; day <= daysInMonth; day++) {
                       const date = new Date(year, month, day);
                       const isTodayDate = isToday(date);
-                      const booking = getBookingForDate(date);
-                      const hasBooking = !!booking;
+                      const result = getBookingForDate(date);
+                      const hasBooking = !!result;
+                      const { booking, isPending } = result || {};
 
                       days.push(
                         <div
@@ -810,12 +812,12 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                           <span className="calendar-day-number">{day}</span>
                           {hasBooking && (
                             <div className="booking-indicator">
-                              <div className="booking-dot" />
+                              <div className={isPending ? "w-1.5 h-1.5 rounded-full bg-amber-400" : "booking-dot"} />
                               <div className="booking-tooltip">
-                                <p className="font-bold text-xs">{booking.className}</p>
-                                {booking.confirmedTime && (
-                                  <p className="text-[10px] text-gray-300 mt-0.5">{booking.confirmedTime}</p>
-                                )}
+                                <p className="font-bold text-xs">{booking.className || "Demo"}</p>
+                                <p className="text-[10px] text-gray-300 mt-0.5">
+                                  {isPending ? "Pending confirmation" : (booking.confirmedTime || "Confirmed")}
+                                </p>
                               </div>
                             </div>
                           )}
@@ -837,7 +839,13 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                     <div className="w-5 h-5 rounded bg-green-100 border border-green-200 flex items-center justify-center">
                       <div className="w-1 h-1 rounded-full bg-green-600" />
                     </div>
-                    <span className="text-gray-600">Scheduled Demo</span>
+                    <span className="text-gray-600">Confirmed Demo</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-5 h-5 rounded bg-amber-50 border border-amber-200 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    </div>
+                    <span className="text-gray-600">Pending Confirmation</span>
                   </div>
                 </div>
               </div>
