@@ -24,33 +24,41 @@ const EventRegModal = ({ event, onClose, user }) => {
   const [msg,     setMsg]     = useState("");
   const [done,    setDone]    = useState(false);
 
-  // Auto-fill from logged-in user profile + fetch university departments
+  // Auto-fill from logged-in user profile, or from event if no profile
   useEffect(() => {
-    if (!user?.token) return;
-    fetch(`${API_BASE}/api/profile/me`, { headers: { Authorization: `Bearer ${user.token}` } })
-      .then((r) => r.ok ? r.json() : null)
-      .then((p) => {
-        if (!p) return;
-        setProfile(p);
-        setForm((f) => ({
-          ...f,
-          name:       p.name           || f.name,
-          email:      p.email          || f.email,
-          phone:      p.phone          || f.phone,
-          college:    p.universityName || f.college,
-          department: p.department     || f.department,
-          batchYear:  p.year           || f.batchYear,
-        }));
-        // Fetch this university's departments for the dropdown
-        if (p.university) {
-          fetch(`${API_BASE}/api/universities/${p.university}`)
-            .then((r) => r.ok ? r.json() : null)
-            .then((uni) => { if (uni?.departments) setDepts(uni.departments); })
-            .catch(() => {});
-        }
-      })
-      .catch(() => {});
-  }, [user]);
+    if (user?.token) {
+      fetch(`${API_BASE}/api/profile/me`, { headers: { Authorization: `Bearer ${user.token}` } })
+        .then((r) => r.ok ? r.json() : null)
+        .then((p) => {
+          if (!p) return;
+          setProfile(p);
+          setForm((f) => ({
+            ...f,
+            name:       p.name           || f.name,
+            email:      p.email          || f.email,
+            phone:      p.phone          || f.phone,
+            college:    p.universityName || f.college,
+            department: p.department     || f.department,
+            batchYear:  p.year           || f.batchYear,
+          }));
+          // Fetch this university's departments for the dropdown
+          if (p.university) {
+            fetch(`${API_BASE}/api/universities/${p.university}`)
+              .then((r) => r.ok ? r.json() : null)
+              .then((uni) => { if (uni?.departments) setDepts(uni.departments); })
+              .catch(() => {});
+          }
+        })
+        .catch(() => {});
+    } else if (event) {
+      // If not logged in, prefill from event (if available)
+      setForm((f) => ({
+        ...f,
+        college: event.universityName || f.college,
+        department: event.targetDepartments && event.targetDepartments.length === 1 ? event.targetDepartments[0] : f.department,
+      }));
+    }
+  }, [user, event]);
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -60,7 +68,7 @@ const EventRegModal = ({ event, onClose, user }) => {
     try {
       const res  = await fetch(`${API_BASE}/api/events/${event._id}/register`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, universityId: event.universityId || undefined }),
       });
       const data = await res.json();
       if (!res.ok) { setMsg(data.message || "Registration failed."); return; }
@@ -76,7 +84,7 @@ const EventRegModal = ({ event, onClose, user }) => {
     try {
       const res  = await fetch(`${API_BASE}/api/events/${event._id}/create-order`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, universityId: event.universityId || undefined }),
       });
       const data = await res.json();
       if (!res.ok) { setMsg(data.message || "Could not create payment order."); return; }
@@ -86,7 +94,7 @@ const EventRegModal = ({ event, onClose, user }) => {
         handler: async (response) => {
           const vRes  = await fetch(`${API_BASE}/api/events/${event._id}/verify-payment`, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...response, ...form }),
+            body: JSON.stringify({ ...response, ...form, universityId: event.universityId || undefined }),
           });
           const vData = await vRes.json();
           if (vRes.ok) setDone(true);
