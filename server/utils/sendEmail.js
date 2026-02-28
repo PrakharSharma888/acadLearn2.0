@@ -1,13 +1,15 @@
 const nodemailer = require("nodemailer");
 
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // true for 465
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
 });
-
 /**
  * Sends a password-reset email with the AcadLearn Jr. branded template.
  * @param {string} toEmail  - recipient email address
