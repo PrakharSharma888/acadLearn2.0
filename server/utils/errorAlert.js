@@ -18,7 +18,7 @@ async function sendErrorAlert({ error, req, payload }) {
   const user = req.user ? JSON.stringify(req.user) : "Guest";
 
   const mailOptions = {
-    from: process.env.ALERT_EMAIL_USER,
+    from: process.env.MAIL_USER,
     to: process.env.ALERT_EMAIL_TO,
     subject: `API Error Alert: ${url}`,
     text: `Error: ${error}\n\nURL: ${url}\nMethod: ${method}\nIP: ${ip}\nUser-Agent: ${userAgent}\nUser: ${user}\nPayload: ${JSON.stringify(body)}\n`,
