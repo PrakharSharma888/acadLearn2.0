@@ -23,7 +23,9 @@ exports.razorpayWebhook = async (req, res) => {
   let parsed;
   try {
     parsed = JSON.parse(rawBody.toString());
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     return res.status(400).json({ message: "Invalid JSON body" });
   }
 

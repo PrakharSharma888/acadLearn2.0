@@ -32,6 +32,8 @@ exports.getClasses = async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
+      const sendErrorAlert = require("../utils/errorAlert");
+      sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -46,6 +48,8 @@ exports.getClassById = async (req, res) => {
     if (!cls.isActive && !isAdmin) return res.status(404).json({ message: "Class not found." });
     res.status(200).json(cls);
   } catch (error) {
+      const sendErrorAlert = require("../utils/errorAlert");
+      sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -56,6 +60,8 @@ exports.createClass = async (req, res) => {
     const cls = await Class.create(req.body);
     res.status(201).json(cls);
   } catch (error) {
+      const sendErrorAlert = require("../utils/errorAlert");
+      sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -82,6 +88,8 @@ exports.updateClass = async (req, res) => {
     res.status(200).json(cls);
   } catch (error) {
     console.error("updateClass error:", error);
+      const sendErrorAlert = require("../utils/errorAlert");
+      sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -93,6 +101,8 @@ exports.deleteClass = async (req, res) => {
     if (!cls) return res.status(404).json({ message: "Class not found." });
     res.status(200).json({ message: "Class deleted." });
   } catch (error) {
+      const sendErrorAlert = require("../utils/errorAlert");
+      sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };

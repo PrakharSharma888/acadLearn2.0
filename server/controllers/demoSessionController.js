@@ -8,6 +8,8 @@ exports.getSessions = async (req, res) => {
       .sort({ date: 1, time: 1 });
     res.json(sessions);
   } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error." });
   }
 };
@@ -18,6 +20,8 @@ exports.getAllSessions = async (req, res) => {
     const sessions = await DemoSession.find().sort({ date: -1, time: -1 });
     res.json(sessions);
   } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error." });
   }
 };
@@ -43,6 +47,8 @@ exports.createSession = async (req, res) => {
     res.status(201).json(session);
   } catch (err) {
     console.error("createSession error:", err);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error." });
   }
 };
@@ -54,6 +60,8 @@ exports.deleteSession = async (req, res) => {
     if (!session) return res.status(404).json({ message: "Session not found." });
     res.json({ message: "Session deleted." });
   } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error." });
   }
 };

@@ -6,7 +6,9 @@ exports.getUniversityBySlug = async (req, res) => {
     const university = await University.findOne({ slug: req.params.slug });
     if (!university) return res.status(404).json({ message: "Organization not found" });
     res.json(university);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -17,7 +19,9 @@ exports.getUniversityById = async (req, res) => {
     const university = await University.findById(req.params.id);
     if (!university) return res.status(404).json({ message: "University not found" });
     res.json(university);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -27,7 +31,9 @@ exports.getUniversities = async (req, res) => {
   try {
     const universities = await University.find({ isActive: true }).sort({ name: 1 });
     res.json(universities);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -37,7 +43,9 @@ exports.getAllUniversities = async (req, res) => {
   try {
     const universities = await University.find().sort({ createdAt: -1 });
     res.json(universities);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -62,6 +70,8 @@ exports.createUniversity = async (req, res) => {
     });
     res.status(201).json(university);
   } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -76,7 +86,9 @@ exports.addDepartment = async (req, res) => {
     university.departments.push({ name, code: code || "" });
     await university.save();
     res.status(201).json(university);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -105,7 +117,9 @@ exports.updateUniversity = async (req, res) => {
     if (logoUrl   !== undefined) university.logoUrl   = logoUrl;
     await university.save();
     res.json(university);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -123,7 +137,9 @@ exports.updateDepartment = async (req, res) => {
     if (code !== undefined) dept.code = code;
     await university.save();
     res.json(university);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -134,7 +150,9 @@ exports.deleteUniversity = async (req, res) => {
     const university = await University.findByIdAndDelete(req.params.id);
     if (!university) return res.status(404).json({ message: "University not found" });
     res.json({ message: "University deleted" });
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };

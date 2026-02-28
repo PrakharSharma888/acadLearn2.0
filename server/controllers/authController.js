@@ -37,6 +37,8 @@ exports.registerUser = async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: error.message });
   }
 };
@@ -59,6 +61,8 @@ exports.loginUser = async (req, res) => {
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: error.message });
   }
 };
@@ -84,6 +88,8 @@ exports.forgotPassword = async (req, res) => {
 
     res.json({ message: "If that email exists, a reset link has been sent." });
   } catch (error) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: error.message });
   }
 };
@@ -113,6 +119,8 @@ exports.resetPassword = async (req, res) => {
 
     res.json({ message: "Password reset successful. You can now log in." });
   } catch (error) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: error.message });
   }
 };

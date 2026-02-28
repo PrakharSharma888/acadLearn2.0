@@ -30,7 +30,9 @@ exports.getBanners = async (req, res) => {
 
     const banners = await Banner.find(filter).sort({ order: 1, createdAt: -1 });
     res.json(banners);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -40,7 +42,9 @@ exports.getAllBanners = async (req, res) => {
   try {
     const banners = await Banner.find().sort({ order: 1, createdAt: -1 });
     res.json(banners);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -69,6 +73,8 @@ exports.createBanner = async (req, res) => {
     });
     res.status(201).json(banner);
   } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -79,7 +85,9 @@ exports.updateBanner = async (req, res) => {
     const banner = await Banner.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!banner) return res.status(404).json({ message: "Banner not found" });
     res.json(banner);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -90,7 +98,9 @@ exports.deleteBanner = async (req, res) => {
     const banner = await Banner.findByIdAndDelete(req.params.id);
     if (!banner) return res.status(404).json({ message: "Banner not found" });
     res.json({ message: "Banner deleted" });
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };

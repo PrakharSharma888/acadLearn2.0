@@ -14,6 +14,8 @@ exports.submitContact = async (req, res) => {
     await sendContactMail({ name, email, message });
     res.status(200).json({ message: "Contact form submitted successfully. Our team will contact you soon!" });
   } catch (error) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };

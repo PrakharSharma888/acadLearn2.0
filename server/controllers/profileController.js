@@ -59,6 +59,8 @@ exports.updateMe = async (req, res) => {
     });
   } catch (err) {
     console.error("updateMe error:", err);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -75,7 +77,9 @@ exports.changePassword = async (req, res) => {
     user.password = newPassword;
     await user.save();
     res.json({ message: "Password updated successfully" });
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -85,7 +89,9 @@ exports.deleteMe = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.user._id);
     res.json({ message: "Account deleted" });
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };

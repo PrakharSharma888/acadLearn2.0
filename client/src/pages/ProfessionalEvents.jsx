@@ -16,7 +16,7 @@ const LockedField = ({ value }) => (
 
 // ── Minimal Pro Navbar ────────────────────────────────────────────────────────
 const ProNavbarMin = () => {
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   useEffect(() => {
     const info = localStorage.getItem("userInfo");
@@ -50,12 +50,12 @@ const ProNavbarMin = () => {
 
 // ── Event Registration Modal ───────────────────────────────────────────────────
 const EventRegModal = ({ event, onClose, user }) => {
-  const [form,    setForm]    = useState({ name: "", parentName: "", phone: "", email: "", batchYear: "", college: "", department: "" });
-  const [depts,   setDepts]   = useState([]); // departments from user's university
+  const [form, setForm] = useState({ name: "", parentName: "", phone: "", email: "", batchYear: "", college: "", department: "" });
+  const [depts, setDepts] = useState([]); // departments from user's university
   const [profile, setProfile] = useState(null);
-  const [saving,  setSaving]  = useState(false);
-  const [msg,     setMsg]     = useState("");
-  const [done,    setDone]    = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [done, setDone] = useState(false);
 
   // Auto-fill from logged-in user profile + fetch university departments
   useEffect(() => {
@@ -74,22 +74,22 @@ const EventRegModal = ({ event, onClose, user }) => {
         setProfile(p);
         setForm((f) => ({
           ...f,
-          name:       p.name           || f.name,
-          email:      p.email          || f.email,
-          phone:      p.phone          || f.phone,
-          batchYear:  p.year           || f.batchYear,
+          name: p.name || f.name,
+          email: p.email || f.email,
+          phone: p.phone || f.phone,
+          batchYear: p.year || f.batchYear,
           // Do NOT overwrite college if event.universityName is present
-          college:    event.universityName || f.college,
+          college: event.universityName || f.college,
         }));
         // Fetch this university's departments for the dropdown
         if (p.university) {
           fetch(`${API_BASE}/api/universities/${p.university}`)
             .then((r) => r.ok ? r.json() : null)
             .then((uni) => { if (uni?.departments) setDepts(uni.departments); })
-            .catch(() => {});
+            .catch(() => { });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user, event]);
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -100,9 +100,9 @@ const EventRegModal = ({ event, onClose, user }) => {
     try {
       const payload = {
         ...form,
-        universityId: event.universityId || undefined,
+        universityId: event.universityId || undefined, // This line must be present
       };
-      const res  = await fetch(`${API_BASE}/api/events/${event._id}/register`, {
+      const res = await fetch(`${API_BASE}/api/events/${event._id}/register`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -110,7 +110,7 @@ const EventRegModal = ({ event, onClose, user }) => {
       if (!res.ok) { setMsg(data.message || "Registration failed."); return; }
       setDone(true);
     } catch { setMsg("Server error. Please try again."); }
-    finally   { setSaving(false); }
+    finally { setSaving(false); }
   };
 
   const handlePaidReg = async (e) => {
@@ -122,7 +122,7 @@ const EventRegModal = ({ event, onClose, user }) => {
         ...form,
         universityId: event.universityId || undefined,
       };
-      const res  = await fetch(`${API_BASE}/api/events/${event._id}/create-order`, {
+      const res = await fetch(`${API_BASE}/api/events/${event._id}/create-order`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -132,7 +132,7 @@ const EventRegModal = ({ event, onClose, user }) => {
         key: data.keyId, amount: data.amount, currency: data.currency,
         name: "AcadLearn", description: data.eventTitle, order_id: data.orderId,
         handler: async (response) => {
-          const vRes  = await fetch(`${API_BASE}/api/events/${event._id}/verify-payment`, {
+          const vRes = await fetch(`${API_BASE}/api/events/${event._id}/verify-payment`, {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...response, ...form, universityId: event.universityId || undefined }),
           });
@@ -141,16 +141,16 @@ const EventRegModal = ({ event, onClose, user }) => {
           else setMsg(vData.message || "Payment verification failed.");
         },
         prefill: { name: form.name, email: form.email, contact: form.phone },
-        theme:   { color: "#2563eb" },
-        modal:   { ondismiss: () => setSaving(false) },
+        theme: { color: "#2563eb" },
+        modal: { ondismiss: () => setSaving(false) },
       };
       new window.Razorpay(options).open();
     } catch { setMsg("Server error. Please try again."); }
-    finally   { setSaving(false); }
+    finally { setSaving(false); }
   };
 
-  const slotsLeft  = event.totalSlots > 0 ? event.totalSlots - event.registeredCount : null;
-  const isFull     = slotsLeft !== null && slotsLeft <= 0;
+  const slotsLeft = event.totalSlots > 0 ? event.totalSlots - event.registeredCount : null;
+  const isFull = slotsLeft !== null && slotsLeft <= 0;
   const isLoggedIn = Boolean(profile);
 
   // Department options: university depts > event targetDepartments > free text
@@ -272,11 +272,10 @@ const EventRegModal = ({ event, onClose, user }) => {
             <div className="flex gap-2 pt-1">
               <button
                 type="submit" disabled={saving || isFull}
-                className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 ${
-                  event.isFree
+                className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 ${event.isFree
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-linear-to-r from-blue-600 to-indigo-500 text-white hover:opacity-90"
-                }`}
+                  }`}
               >
                 {saving ? "Processing..." : event.isFree ? "Register for Free" : `Pay ₹${event.price} & Register`}
               </button>
@@ -301,21 +300,21 @@ const isUpcoming = (ev) => {
 };
 
 const PILLS = [
-  { key: "all",      label: "All" },
+  { key: "all", label: "All" },
   { key: "upcoming", label: "Upcoming" },
-  { key: "past",     label: "Past" },
-  { key: "free",     label: "Free" },
-  { key: "paid",     label: "Paid" },
+  { key: "past", label: "Past" },
+  { key: "free", label: "Free" },
+  { key: "paid", label: "Paid" },
 ];
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 const ProfessionalEvents = () => {
   const [allEvents, setAllEvents] = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [search,    setSearch]    = useState("");
-  const [pill,      setPill]      = useState("all");
-  const [regModal,  setRegModal]  = useState(null);
-  const [user,      setUser]      = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [pill, setPill] = useState("all");
+  const [regModal, setRegModal] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const info = localStorage.getItem("userInfo");
@@ -328,7 +327,7 @@ const ProfessionalEvents = () => {
       const res = await fetch(`${API_BASE}/api/events?page=professional`);
       setAllEvents(res.ok ? await res.json() : []);
     } catch { setAllEvents([]); }
-    finally   { setLoading(false); }
+    finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadEvents(); }, [loadEvents]);
@@ -342,9 +341,9 @@ const ProfessionalEvents = () => {
   // Apply pill filter
   const afterPill = sorted.filter((ev) => {
     if (pill === "upcoming") return isUpcoming(ev);
-    if (pill === "past")     return !isUpcoming(ev);
-    if (pill === "free")     return ev.isFree;
-    if (pill === "paid")     return !ev.isFree;
+    if (pill === "past") return !isUpcoming(ev);
+    if (pill === "free") return ev.isFree;
+    if (pill === "paid") return !ev.isFree;
     return true;
   });
 
@@ -352,10 +351,10 @@ const ProfessionalEvents = () => {
   const q = search.trim().toLowerCase();
   const filtered = q.length > 0
     ? afterPill.filter((ev) =>
-        (ev.title        || "").toLowerCase().includes(q) ||
-        (ev.description  || "").toLowerCase().includes(q) ||
-        (ev.universityName || "").toLowerCase().includes(q)
-      )
+      (ev.title || "").toLowerCase().includes(q) ||
+      (ev.description || "").toLowerCase().includes(q) ||
+      (ev.universityName || "").toLowerCase().includes(q)
+    )
     : afterPill;
 
   return (
@@ -401,11 +400,10 @@ const ProfessionalEvents = () => {
             <button
               key={p.key}
               onClick={() => setPill(p.key)}
-              className={`px-4 py-1.5 rounded-full text-sm font-bold border transition-all ${
-                pill === p.key
+              className={`px-4 py-1.5 rounded-full text-sm font-bold border transition-all ${pill === p.key
                   ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                   : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600"
-              }`}
+                }`}
             >
               {p.label}
             </button>
@@ -459,15 +457,14 @@ const ProfessionalEvents = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((ev) => {
-              const upcoming  = isUpcoming(ev);
+              const upcoming = isUpcoming(ev);
               const slotsLeft = ev.totalSlots > 0 ? ev.totalSlots - ev.registeredCount : null;
-              const isFull    = slotsLeft !== null && slotsLeft <= 0;
+              const isFull = slotsLeft !== null && slotsLeft <= 0;
               return (
                 <div
                   key={ev._id}
-                  className={`bg-white rounded-3xl overflow-hidden border flex flex-col transition-all ${
-                    upcoming ? "border-blue-100 shadow-sm hover:shadow-md" : "border-gray-100 opacity-60"
-                  }`}
+                  className={`bg-white rounded-3xl overflow-hidden border flex flex-col transition-all ${upcoming ? "border-blue-100 shadow-sm hover:shadow-md" : "border-gray-100 opacity-60"
+                    }`}
                 >
                   {/* Image */}
                   <div className="h-36 relative overflow-hidden">
@@ -512,15 +509,14 @@ const ProfessionalEvents = () => {
                     <button
                       onClick={() => upcoming && !isFull && setRegModal(ev)}
                       disabled={!upcoming || isFull}
-                      className={`mt-auto w-full py-2.5 rounded-2xl text-sm font-bold transition-all ${
-                        !upcoming
+                      className={`mt-auto w-full py-2.5 rounded-2xl text-sm font-bold transition-all ${!upcoming
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : isFull
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : ev.isFree
                               ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
                               : "bg-linear-to-r from-blue-600 to-indigo-500 text-white hover:opacity-90 shadow-sm"
-                      }`}
+                        }`}
                     >
                       {!upcoming ? "Event Ended" : isFull ? "Fully Booked" : ev.isFree ? "Register for Free" : `Pay ₹${ev.price} & Register`}
                     </button>

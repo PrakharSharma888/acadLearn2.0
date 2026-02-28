@@ -2,6 +2,7 @@ const Razorpay = require("razorpay");
 const crypto   = require("crypto");
 const Event    = require("../models/Event");
 const EventRegistration = require("../models/EventRegistration");
+const sendErrorAlert = require("../utils/errorAlert");
 
 let _razorpay = null;
 const getRazorpay = () => {
@@ -36,7 +37,12 @@ exports.getEvents = async (req, res) => {
       filter.showOn = { $in: ["org", "junior", "both", "professional"] };
     }
     const events = await Event.find(filter).sort({ date: 1, createdAt: -1 });
-    res.json(events);
+    // Always include universityId (and optionally populate university name)
+    res.json(events.map(ev => ({
+      ...ev.toObject(),
+      universityId: ev.universityId || null,
+      universityName: ev.universityName || "",
+    })));
   } catch { res.status(500).json({ message: "Server error" }); }
 };
 
@@ -53,7 +59,11 @@ exports.getEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
-    res.json(event);
+    // Always include universityId
+    res.json({
+      ...event.toObject(),
+      universityId: event.universityId || null,
+    });
   } catch { res.status(500).json({ message: "Server error" }); }
 };
 
@@ -83,6 +93,7 @@ exports.createEvent = async (req, res) => {
     res.status(201).json(event);
   } catch (err) {
     console.error("createEvent error:", err);
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -162,6 +173,7 @@ exports.registerFree = async (req, res) => {
     res.status(201).json({ message: "Registered successfully!", registration: reg });
   } catch (err) {
     console.error("registerFree error:", err);
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -174,6 +186,15 @@ exports.createPaymentOrder = async (req, res) => {
     if (event.isFree) return res.status(400).json({ message: "This event is free — no payment needed." });
     if (event.totalSlots > 0 && event.registeredCount >= event.totalSlots) {
       return res.status(400).json({ message: "All slots are full!" });
+    }
+
+    // Prevent duplicate paid registration
+    const { email } = req.body;
+    if (email) {
+      const existing = await EventRegistration.findOne({ eventId: event._id, email: email.toLowerCase() });
+      if (existing) {
+        return res.status(409).json({ message: "You are already registered for this event." });
+      }
     }
 
     // Razorpay receipt max length = 40 chars
@@ -195,6 +216,7 @@ exports.createPaymentOrder = async (req, res) => {
     });
   } catch (err) {
     console.error("createPaymentOrder error:", err);
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Could not create payment order." });
   }
 };
@@ -241,6 +263,7 @@ exports.verifyPayment = async (req, res) => {
     res.json({ success: true, message: "Payment verified & registered!", registration: reg });
   } catch (err) {
     console.error("verifyPayment error:", err);
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Payment verification failed." });
   }
 };

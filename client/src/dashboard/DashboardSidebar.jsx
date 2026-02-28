@@ -58,7 +58,8 @@ const DashboardSidebar = ({ user, activeNav, bookings, onLogout }) => {
             <img src={Logo} alt="AcadLearn Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-lg font-bold text-slate-800 tracking-tight">
-            AcadLearn <span className="text-orange-600 text-sm font-semibold">JR</span>
+            AcadLearn 
+            {/* <span className="text-orange-600 text-sm font-semibold">JR</span> */}
           </span>
         </Link>
       </div>

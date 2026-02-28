@@ -41,6 +41,8 @@ exports.bookDemo = async (req, res) => {
     res.status(201).json({ message: "Demo booked successfully! Check your email for confirmation.", booking });
   } catch (error) {
     console.error("Demo booking error:", error);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -53,7 +55,9 @@ exports.getBookings = async (req, res) => {
       .populate("classId", "title category")
       .populate("userId", "universityName department year semester");
     res.status(200).json(bookings);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -72,7 +76,9 @@ exports.getMyBookings = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("classId", "title category");
     res.status(200).json(bookings);
-  } catch {
+  } catch (err) {
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -94,6 +100,8 @@ exports.cancelBooking = async (req, res) => {
     res.json({ message: "Booking cancelled", booking });
   } catch (err) {
     console.error("cancelBooking error:", err);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };
@@ -114,6 +122,8 @@ exports.updateBookingStatus = async (req, res) => {
     res.json({ message: `Booking ${status} successfully`, booking });
   } catch (error) {
     console.error("Update booking status error:", error);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: error.stack || error, req });
     res.status(500).json({ message: "Server error. Please try again." });
   }
 };

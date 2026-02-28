@@ -44,6 +44,8 @@ exports.createOrder = async (req, res) => {
     });
   } catch (err) {
     console.error("Razorpay createOrder error:", err);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Could not create payment order. Please try again." });
   }
 };
@@ -75,6 +77,8 @@ exports.verifyPayment = async (req, res) => {
     });
   } catch (err) {
     console.error("Razorpay verifyPayment error:", err);
+    const sendErrorAlert = require("../utils/errorAlert");
+    sendErrorAlert({ error: err.stack || err, req });
     res.status(500).json({ message: "Payment verification failed. Please contact support." });
   }
 };
