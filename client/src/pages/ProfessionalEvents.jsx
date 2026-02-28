@@ -98,9 +98,13 @@ const EventRegModal = ({ event, onClose, user }) => {
     e.preventDefault();
     setSaving(true); setMsg("");
     try {
+      const payload = {
+        ...form,
+        universityId: event.universityId || undefined,
+      };
       const res  = await fetch(`${API_BASE}/api/events/${event._id}/register`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) { setMsg(data.message || "Registration failed."); return; }
@@ -114,9 +118,13 @@ const EventRegModal = ({ event, onClose, user }) => {
     if (!form.name || !form.email) { setMsg("Name and email are required."); return; }
     setSaving(true); setMsg("");
     try {
+      const payload = {
+        ...form,
+        universityId: event.universityId || undefined,
+      };
       const res  = await fetch(`${API_BASE}/api/events/${event._id}/create-order`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) { setMsg(data.message || "Could not create payment order."); return; }
@@ -126,7 +134,7 @@ const EventRegModal = ({ event, onClose, user }) => {
         handler: async (response) => {
           const vRes  = await fetch(`${API_BASE}/api/events/${event._id}/verify-payment`, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...response, ...form }),
+            body: JSON.stringify({ ...response, ...form, universityId: event.universityId || undefined }),
           });
           const vData = await vRes.json();
           if (vRes.ok) setDone(true);

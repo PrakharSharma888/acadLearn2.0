@@ -12,6 +12,7 @@ const eventRegistrationSchema = new mongoose.Schema(
     phone:      { type: String, default: "" },
     batchYear:  { type: String, default: "" },
     college:    { type: String, default: "" },
+    universityId: { type: mongoose.Schema.Types.ObjectId, ref: "University", default: null },
     department: { type: String, default: "" },
 
     // Payment

@@ -22,7 +22,15 @@ const demoSessionRoutes = require("./routes/demoSessionRoutes");
 const paymentRoutes      = require("./routes/paymentRoutes");
 const universityRoutes   = require("./routes/universityRoutes");
 const bannerRoutes       = require("./routes/bannerRoutes");
-const eventRoutes        = require("./routes/eventRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+const razorpayWebhookRoutes = require("./routes/razorpayWebhookRoutes");
+
+// Razorpay webhook needs raw body for signature verification
+const bodyParser = require("body-parser");
+app.use("/api/events/razorpay-webhook", bodyParser.raw({ type: "application/json" }));
+app.use("/api/events", eventRoutes);
+app.use("/api/events", razorpayWebhookRoutes);
+// Other routes
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/classes", classRoutes);
@@ -31,8 +39,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/demo-sessions", demoSessionRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/universities", universityRoutes);
-app.use("/api/banners",      bannerRoutes);
-app.use("/api/events",       eventRoutes);
+app.use("/api/banners", bannerRoutes);
 
 // Database Connection
 mongoose

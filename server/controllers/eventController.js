@@ -128,7 +128,7 @@ exports.getRegistrations = async (req, res) => {
 
 // ── POST /api/events/:id/register — free event registration ──────────────────
 exports.registerFree = async (req, res) => {
-  const { name, parentName, email, phone, batchYear, college, department } = req.body;
+  const { name, parentName, email, phone, batchYear, college, department, universityId } = req.body;
   if (!name || !email) return res.status(400).json({ message: "Name and email are required" });
   try {
     const event = await Event.findById(req.params.id);
@@ -145,17 +145,18 @@ exports.registerFree = async (req, res) => {
     if (existing) return res.status(409).json({ message: "You are already registered for this event." });
 
     const reg = await EventRegistration.create({
-      eventId:    event._id,
-      userId:     req.user?._id || null,
+      eventId:      event._id,
+      userId:       req.user?._id || null,
       name,
-      parentName: parentName  || "",
-      email:      email.toLowerCase(),
-      phone:      phone       || "",
-      batchYear:  batchYear   || "",
-      college:    college     || "",
-      department: department  || "",
-      isPaid:     false,
-      status:     "confirmed",
+      parentName:   parentName  || "",
+      email:        email.toLowerCase(),
+      phone:        phone       || "",
+      batchYear:    batchYear   || "",
+      college:      college     || "",
+      department:   department  || "",
+      universityId: universityId || event.universityId || null,
+      isPaid:       false,
+      status:       "confirmed",
     });
     await Event.findByIdAndUpdate(event._id, { $inc: { registeredCount: 1 } });
     res.status(201).json({ message: "Registered successfully!", registration: reg });
@@ -175,10 +176,13 @@ exports.createPaymentOrder = async (req, res) => {
       return res.status(400).json({ message: "All slots are full!" });
     }
 
+    // Razorpay receipt max length = 40 chars
+    let receipt = `evt_${event._id}_${Date.now()}`;
+    if (receipt.length > 40) receipt = receipt.slice(0, 40);
     const order = await getRazorpay().orders.create({
       amount:   Math.round(event.price * 100), // paise
       currency: "INR",
-      receipt:  `evt_${event._id}_${Date.now()}`,
+      receipt,
       notes:    { eventId: event._id.toString(), eventTitle: event.title },
     });
 
@@ -197,7 +201,7 @@ exports.createPaymentOrder = async (req, res) => {
 
 // ── POST /api/events/:id/verify-payment — verify + complete registration ──────
 exports.verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, name, parentName, email, phone, batchYear, college, department } = req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, name, parentName, email, phone, batchYear, college, department, universityId } = req.body;
   if (!name || !email) return res.status(400).json({ message: "Name and email are required" });
   try {
     // Verify signature
@@ -217,20 +221,21 @@ exports.verifyPayment = async (req, res) => {
     if (existing) return res.status(409).json({ message: "You are already registered for this event." });
 
     const reg = await EventRegistration.create({
-      eventId:    event._id,
-      userId:     req.user?._id || null,
+      eventId:      event._id,
+      userId:       req.user?._id || null,
       name,
-      parentName: parentName  || "",
-      email:      email.toLowerCase(),
-      phone:      phone       || "",
-      batchYear:  batchYear   || "",
-      college:    college     || "",
-      department: department  || "",
-      isPaid:     true,
-      paymentId:  razorpay_payment_id,
-      orderId:    razorpay_order_id,
-      amount:     event.price,
-      status:     "confirmed",
+      parentName:   parentName  || "",
+      email:        email.toLowerCase(),
+      phone:        phone       || "",
+      batchYear:    batchYear   || "",
+      college:      college     || "",
+      department:   department  || "",
+      universityId: universityId || event.universityId || null,
+      isPaid:       true,
+      paymentId:    razorpay_payment_id,
+      orderId:      razorpay_order_id,
+      amount:       event.price,
+      status:       "confirmed",
     });
     await Event.findByIdAndUpdate(event._id, { $inc: { registeredCount: 1 } });
     res.json({ success: true, message: "Payment verified & registered!", registration: reg });
