@@ -1,8 +1,21 @@
 // utils/errorAlert.js
 const nodemailer = require("nodemailer");
 
+// const transporter = nodemailer.createTransport({
+//   service: "gmail", // or your SMTP provider
+//   auth: {
+//     user: process.env.ALERT_EMAIL_USER,
+//     pass: process.env.ALERT_EMAIL_PASS,
+//   },
+// });
+
+
+const nodemailer = require("nodemailer");
+
 const transporter = nodemailer.createTransport({
-  service: "gmail", // or your SMTP provider
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // true for 465
   auth: {
     user: process.env.ALERT_EMAIL_USER,
     pass: process.env.ALERT_EMAIL_PASS,
