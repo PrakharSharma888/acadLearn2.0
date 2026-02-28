@@ -58,6 +58,23 @@ app.get("/", (req, res) => {
 //   });
 // }
 
+const nodemailer =require("nodemailer");
+const transporter = nodemailer.createTransport({
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // true for 465
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
+
+transporter.verify().then(() => {
+  console.log("Email transporter is ready");
+}).catch((err) => {
+  console.error("Error with email transporter:", err);
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
