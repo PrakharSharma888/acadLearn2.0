@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getUniversities,
   getAllUniversities,
+  getUniversityById,
   getUniversityBySlug,
   createUniversity,
   updateUniversity,
@@ -16,6 +17,7 @@ const { protect, admin } = require("../middleware/authMiddleware");
 router.get("/", getUniversities);                                                        // public
 router.get("/all", protect, admin, getAllUniversities);                                  // admin
 router.get("/slug/:slug", getUniversityBySlug);                                          // public — org page
+router.get("/:id", getUniversityById);                                                   // public — get single university by id
 router.post("/", protect, admin, createUniversity);                                      // admin
 router.put("/:id", protect, admin, updateUniversity);                                    // admin
 router.post("/:id/departments", protect, admin, addDepartment);                          // admin

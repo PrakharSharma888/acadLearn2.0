@@ -19,6 +19,7 @@ const EMPTY_FORM = {
   universityName:     "",
   targetDepartments:  [],
   allowPublicBooking: true,
+  eventId:            "",
 };
 
 const SHOW_ON_LABELS = { junior: "Junior", professional: "Professional", both: "Both" };
@@ -43,8 +44,9 @@ const PromoteTab = ({ token }) => {
   const [page, setPage]             = useState(0);
   const [allClasses, setAllClasses] = useState([]);
   const [universities, setUniversities] = useState([]);
+  const [allEvents,  setAllEvents]  = useState([]);
 
-  // Load classes + universities when modal opens
+  // Load classes + universities + events when modal opens
   useEffect(() => {
     if (!showModal) return;
     Promise.all([
@@ -52,9 +54,12 @@ const PromoteTab = ({ token }) => {
         .then((r) => r.ok ? r.json() : []).catch(() => []),
       fetch(`${API_BASE}/api/universities`)
         .then((r) => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([classes, univs]) => {
+      fetch(`${API_BASE}/api/events/all`, { headers: authHeader(token) })
+        .then((r) => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([classes, univs, events]) => {
       setAllClasses(classes);
       setUniversities(univs);
+      setAllEvents(events);
     });
   }, [showModal, token]);
 
@@ -168,6 +173,7 @@ const PromoteTab = ({ token }) => {
       universityName:    b.universityName    || "",
       targetDepartments: Array.isArray(b.targetDepartments) ? b.targetDepartments : [],
       allowPublicBooking: b.allowPublicBooking !== false,
+      eventId: b.eventId || "",
     });
     setPreview(b.imageUrl);
     setEditId(b._id); setMsg("");
@@ -558,6 +564,44 @@ const PromoteTab = ({ token }) => {
                         </span>
                       </div>
                     )}
+                  </div>
+
+                  {/* ── Link to Event ── */}
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Link to Event (optional)</p>
+                    <p className="text-[11px] text-gray-400 -mt-2">Banner click hone par seedha event registration page khulega</p>
+                    <select
+                      value={form.eventId}
+                      onChange={(e) => setForm((f) => ({ ...f, eventId: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    >
+                      <option value="">— No event linked —</option>
+                      {allEvents.map((ev) => (
+                        <option key={ev._id} value={ev._id}>
+                          {ev.title} · {ev.date} · {ev.isFree ? "Free" : `₹${ev.price}`}
+                          {ev.totalSlots > 0 ? ` · ${ev.totalSlots - ev.registeredCount} slots left` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {form.eventId && (() => {
+                      const ev = allEvents.find((e) => e._id === form.eventId);
+                      if (!ev) return null;
+                      const left = ev.totalSlots > 0 ? ev.totalSlots - ev.registeredCount : null;
+                      return (
+                        <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2 flex-wrap">
+                          <span className="text-xs font-semibold text-indigo-700">{ev.title}</span>
+                          {ev.isFree
+                            ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">FREE</span>
+                            : <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">₹{ev.price}</span>
+                          }
+                          {left !== null && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${left <= 0 ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"}`}>
+                              {left <= 0 ? "FULL" : `${left} slots left`}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* ── Target University & Departments ── */}

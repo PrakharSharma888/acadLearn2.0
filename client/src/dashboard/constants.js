@@ -29,4 +29,5 @@ export const NAV_ITEMS = [
   { key: "admin", label: "Admin Panel", path: "/dashboard/admin", adminOnly: true },
   { key: "universities", label: "Universities", path: "/dashboard/universities", adminOnly: true },
   { key: "promote",      label: "Promote",      path: "/dashboard/promote",      adminOnly: true },
+  { key: "events",       label: "Events",       path: "/dashboard/events",        adminOnly: true },
 ];

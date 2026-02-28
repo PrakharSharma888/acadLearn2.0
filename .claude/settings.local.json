@@ -3,7 +3,13 @@
     "allow": [
       "Bash(python3:*)",
       "Bash(cat /Users/sahilnagpal/Documents/GitHub/acadLearn2.0/server/routes/*.js)",
-      "Bash(xxd)"
+      "Bash(xxd)",
+      "Bash(git add server/controllers/universityController.js)",
+      "Bash(git commit:*)",
+      "Bash(git push own main)",
+      "Bash(curl -s 'http://localhost:5000/api/events/all' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Nzk5YzUyMzYzZmIwYWFhYzIwMjdlZSIsImlhdCI6MTc3MjE5NDQyMywiZXhwIjoxNzc0Nzg2NDIzfQ.owxV_PcYgnUmwZl7TB3Gcj3P35g1tNgW5dtX5Qexx_o' -H 'Content-Type: application/json')",
+      "Bash(curl -s 'http://localhost:5000/api/banners?page=professional')",
+      "Bash(curl -s 'http://localhost:5000/api/banners/all' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Nzk5YzUyMzYzZmIwYWFhYzIwMjdlZSIsImlhdCI6MTc3MjE5NDQyMywiZXhwIjoxNzc0Nzg2NDIzfQ.owxV_PcYgnUmwZl7TB3Gcj3P35g1tNgW5dtX5Qexx_o')"
     ]
   }
 }

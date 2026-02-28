@@ -2,13 +2,238 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import ProHeroImg from "../assets/pro-hero.png";
 import Logo from "../assets/logo.jpeg";
-import Pro4 from "../assets/pro4.png";
-import Pro5 from "../assets/pro5.png";
-import Pro6 from "../assets/pro6.png";
 import API_BASE from "../config/api";
 import BannerCarousel from "../components/BannerCarousel";
 import BookDemoModal from "../components/BookDemoModal";
 
+// ── Locked field display ───────────────────────────────────────────────────────
+const LockedField = ({ value, accent = "blue" }) => (
+  <div className={`flex items-center gap-2 bg-${accent}-50 border border-${accent}-200 rounded-xl px-3 py-2`}>
+    <svg className={`w-3.5 h-3.5 text-${accent}-400 shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+    <span className={`text-sm font-semibold text-${accent}-700 truncate`}>{value}</span>
+  </div>
+);
+
+// ── Event Registration Modal ───────────────────────────────────────────────────
+const EventRegModal = ({ event, onClose, user }) => {
+  const [form, setForm] = useState({ name: "", parentName: "", phone: "", email: "", batchYear: "", college: "", department: "" });
+  const [depts, setDepts] = useState([]); // departments from user's university
+  const [profile, setProfile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [done, setDone] = useState(false);
+
+  // Auto-fill from logged-in user profile + fetch university departments
+  useEffect(() => {
+    if (!user?.token) return;
+    fetch(`${API_BASE}/api/profile/me`, { headers: { Authorization: `Bearer ${user.token}` } })
+      .then((r) => r.ok ? r.json() : null)
+      .then((p) => {
+        if (!p) return;
+        setProfile(p);
+        setForm((f) => ({
+          ...f,
+          name: p.name || f.name,
+          email: p.email || f.email,
+          phone: p.phone || f.phone,
+          college: p.universityName || f.college,
+          department: p.department || f.department,
+          batchYear: p.year || f.batchYear,
+        }));
+        // Fetch this university's departments for the dropdown
+        if (p.university) {
+          fetch(`${API_BASE}/api/universities/${p.university}`)
+            .then((r) => r.ok ? r.json() : null)
+            .then((uni) => { if (uni?.departments) setDepts(uni.departments); })
+            .catch(() => { });
+        }
+      })
+      .catch(() => { });
+  }, [user]);
+
+  const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const INP = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white";
+
+  const handleFreeReg = async (e) => {
+    e.preventDefault();
+    setSaving(true); setMsg("");
+    try {
+      const res = await fetch(`${API_BASE}/api/events/${event._id}/register`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) { setMsg(data.message || "Registration failed."); return; }
+      setDone(true);
+    } catch { setMsg("Server error. Please try again."); }
+    finally { setSaving(false); }
+  };
+
+  const handlePaidReg = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email) { setMsg("Name and email are required."); return; }
+    setSaving(true); setMsg("");
+    try {
+      const res = await fetch(`${API_BASE}/api/events/${event._id}/create-order`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) { setMsg(data.message || "Could not create payment order."); return; }
+      const options = {
+        key: data.keyId, amount: data.amount, currency: data.currency,
+        name: "AcadLearn", description: data.eventTitle, order_id: data.orderId,
+        handler: async (response) => {
+          const vRes = await fetch(`${API_BASE}/api/events/${event._id}/verify-payment`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...response, ...form }),
+          });
+          const vData = await vRes.json();
+          if (vRes.ok) setDone(true);
+          else setMsg(vData.message || "Payment verification failed.");
+        },
+        prefill: { name: form.name, email: form.email, contact: form.phone },
+        theme: { color: "#2563eb" },
+        modal: { ondismiss: () => setSaving(false) },
+      };
+      new window.Razorpay(options).open();
+    } catch { setMsg("Server error. Please try again."); }
+    finally { setSaving(false); }
+  };
+
+  const slotsLeft = event.totalSlots > 0 ? event.totalSlots - event.registeredCount : null;
+  const isFull = slotsLeft !== null && slotsLeft <= 0;
+  const isLoggedIn = Boolean(profile);
+
+  // Department options: university depts > event targetDepartments > free text
+  const deptOptions = depts.length > 0
+    ? depts.map((d) => d.name)
+    : (event.targetDepartments?.length > 0 ? event.targetDepartments : []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-linear-to-r from-blue-600 to-indigo-500 p-5 text-white">
+          <button onClick={onClose} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-sm">✕</button>
+          <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mb-1">Register</p>
+          <h2 className="text-lg font-bold leading-snug">{event.title}</h2>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {event.isFree
+              ? <span className="text-xs font-bold bg-green-400/30 border border-green-300/50 px-2 py-0.5 rounded-full">FREE</span>
+              : <span className="text-xs font-bold bg-white/20 border border-white/30 px-2 py-0.5 rounded-full">₹{event.price}</span>
+            }
+            {slotsLeft !== null && (
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isFull ? "bg-red-400/30 border border-red-300/50" : "bg-white/20 border border-white/30"}`}>
+                {isFull ? "FULL" : `${slotsLeft} slots left`}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {done ? (
+          <div className="p-8 text-center">
+            <div className="text-5xl mb-3">🎉</div>
+            <h3 className="text-xl font-black text-slate-800 mb-1">Registered!</h3>
+            <p className="text-sm text-gray-500 mb-4">We'll send details to <strong>{form.email}</strong></p>
+            <button onClick={onClose} className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">Done</button>
+          </div>
+        ) : (
+          <form onSubmit={event.isFree ? handleFreeReg : handlePaidReg} className="p-5 space-y-3 max-h-[65vh] overflow-y-auto">
+            {isFull && <p className="text-sm font-semibold text-red-500 bg-red-50 border border-red-200 rounded-xl px-3 py-2">Sorry, all slots are full!</p>}
+
+            {/* Auto-filled info strip for logged-in users */}
+            {isLoggedIn && (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5 flex items-center gap-2">
+                <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-xs text-blue-700 font-medium">Details auto-filled from your profile</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {/* Name */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Name *</label>
+                {isLoggedIn ? <LockedField value={form.name} accent="blue" /> : (
+                  <input name="name" value={form.name} onChange={handleChange} required placeholder="Your full name" className={INP} />
+                )}
+              </div>
+
+              {/* Parent Name — always editable */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Parent Name</label>
+                <input name="parentName" value={form.parentName} onChange={handleChange} placeholder="Parent / Guardian name" className={INP} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Phone */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Phone *</label>
+                  {isLoggedIn && form.phone ? <LockedField value={form.phone} accent="blue" /> : (
+                    <input name="phone" value={form.phone} onChange={handleChange} required placeholder="10-digit mobile" className={INP} />
+                  )}
+                </div>
+                {/* Email */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Email *</label>
+                  {isLoggedIn ? <LockedField value={form.email} accent="blue" /> : (
+                    <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="you@email.com" className={INP} />
+                  )}
+                </div>
+              </div>
+
+              {/* Batch & Year */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Batch &amp; Year</label>
+                {isLoggedIn && form.batchYear ? <LockedField value={form.batchYear} accent="blue" /> : (
+                  <input name="batchYear" value={form.batchYear} onChange={handleChange} placeholder="e.g. B.Tech 2nd Year / 2022–26" className={INP} />
+                )}
+              </div>
+
+              {/* College */}
+              <label>College / Institute</label>
+              {event.universityName ? (
+                <LockedField value={event.universityName} />
+              ) : isLoggedIn && form.college ? (
+                <LockedField value={form.college} />
+              ) : (
+                <input name="college" value={form.college} onChange={handleChange} placeholder="Your college / institute" className={INP} />
+              )}
+              {/* Department */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Department</label>
+                {deptOptions.length > 0 ? (
+                  <select name="department" value={form.department} onChange={handleChange} className={INP}>
+                    <option value="">— Select department —</option>
+                    {deptOptions.map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                ) : isLoggedIn && form.department ? (
+                  <LockedField value={form.department} accent="blue" />
+                ) : (
+                  <input name="department" value={form.department} onChange={handleChange} placeholder="e.g. CSE, ECE" className={INP} />
+                )}
+              </div>
+            </div>
+
+            {msg && <p className="text-xs text-red-500 font-medium">{msg}</p>}
+            <div className="flex gap-2 pt-1">
+              <button type="submit" disabled={saving || isFull}
+                className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 ${event.isFree ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-linear-to-r from-blue-600 to-indigo-500 text-white hover:opacity-90"}`}
+              >
+                {saving ? "Processing..." : event.isFree ? "Register for Free" : `Pay ₹${event.price} & Register`}
+              </button>
+              <button type="button" onClick={onClose} className="px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-200">Cancel</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
 // ── Navbar ─────────────────────────────────────────────────────────────────────
 const ProNavbar = () => {
   const navigate = useNavigate();
@@ -128,12 +353,14 @@ const ProNavbar = () => {
 // ── Page ───────────────────────────────────────────────────────────────────────
 const ProfessionalHome = () => {
   const navigate = useNavigate();
-  const [courses, setCourses]       = useState([]);
-  const [banners, setBanners]       = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [bannerDemo, setBannerDemo] = useState(null);
   const [courseDemo, setCourseDemo] = useState(null);
-  const [noDemoMsg, setNoDemoMsg]   = useState({});  // courseId → true/false
-  const [user, setUser]             = useState(null);
+  const [noDemoMsg, setNoDemoMsg] = useState({});
+  const [user, setUser] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [regModal, setRegModal] = useState(null);
 
   useEffect(() => {
     const info = localStorage.getItem("userInfo");
@@ -145,13 +372,13 @@ const ProfessionalHome = () => {
   const handleBannerClick = (banner) => {
     if (banner.classId) {
       setBannerDemo({
-        _id:               banner.classId,
-        title:             banner.className || banner.title,
-        category:          banner.category || "professional",
-        classSlug:         banner.classSlug,
-        department:        banner.department,
-        universityId:      banner.universityId      || "",
-        universityName:    banner.universityName    || "",
+        _id: banner.classId,
+        title: banner.className || banner.title,
+        category: banner.category || "professional",
+        classSlug: banner.classSlug,
+        department: banner.department,
+        universityId: banner.universityId || "",
+        universityName: banner.universityName || "",
         targetDepartments: banner.targetDepartments || [],
       });
     } else if (banner.link) {
@@ -184,15 +411,17 @@ const ProfessionalHome = () => {
 
   const loadData = useCallback(async () => {
     try {
-      const [cRes, bRes] = await Promise.all([
+      const [cRes, bRes, eRes] = await Promise.all([
         fetch(`${API_BASE}/api/classes`),
         fetch(`${API_BASE}/api/banners?page=professional`),
+        fetch(`${API_BASE}/api/events?page=professional`),
       ]);
       if (cRes.ok) {
         const all = await cRes.json();
         setCourses(all.filter((c) => c.category === "professional" && c.isActive));
       }
       if (bRes.ok) setBanners(await bRes.json());
+      if (eRes.ok) setEvents(await eRes.json());
     } catch { /* silent */ }
   }, []);
 
@@ -260,7 +489,95 @@ const ProfessionalHome = () => {
           </div>
         </section>
 
-        {/* Section 2: The "Why" */}
+        {/* Section 2: Upcoming Events */}
+        {(() => {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const upcomingEvents = events
+            .filter(ev => new Date(ev.date + "T00:00:00") >= today)
+            .slice(0, 3);
+          if (events.length === 0) return null;
+          return (
+            <section className="py-16 container mx-auto px-4">
+              <div className="text-center mb-10">
+                <div className="inline-block px-4 py-1 bg-blue-100 text-blue-700 font-bold rounded-full mb-3 text-sm uppercase tracking-wide">
+                  Events
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-2">Upcoming Events</h2>
+                <p className="text-lg text-gray-500">Workshops, seminars &amp; live sessions for professionals</p>
+              </div>
+              {upcomingEvents.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 text-sm">No upcoming events right now. Check back soon!</div>
+              ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {upcomingEvents.map((ev) => {
+                    const slotsLeft = ev.totalSlots > 0 ? ev.totalSlots - ev.registeredCount : null;
+                    const isFull = slotsLeft !== null && slotsLeft <= 0;
+                    return (
+                      <div key={ev._id} className="bg-white rounded-3xl overflow-hidden border border-blue-100 shadow-sm flex flex-col">
+                        <div className="h-36 relative overflow-hidden">
+                          {ev.imageUrl
+                            ? <img src={ev.imageUrl} alt={ev.title} className="w-full h-full object-cover" />
+                            : <div className="w-full h-full bg-linear-to-br from-blue-500 to-indigo-400" />
+                          }
+                          <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
+                            {ev.isFree
+                              ? <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500 text-white">FREE</span>
+                              : <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-600 text-white">₹{ev.price}</span>
+                            }
+                            {slotsLeft !== null && (
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isFull ? "bg-red-500 text-white" : "bg-white/90 text-gray-700"}`}>
+                                {isFull ? "FULL" : `${slotsLeft} slots`}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="p-5 flex-1 flex flex-col">
+                          <p className="text-xs font-semibold text-blue-500 mb-1">
+                            {new Date(ev.date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            {ev.time ? ` · ${ev.time}` : ""}
+                          </p>
+                          <h3 className="font-black text-slate-900 text-base mb-1 line-clamp-2">{ev.title}</h3>
+                          {ev.description && <p className="text-xs text-gray-500 mb-3 line-clamp-2 flex-1">{ev.description}</p>}
+                          {ev.universityName && (
+                            <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full self-start mb-3">
+                              {ev.universityName}
+                            </span>
+                          )}
+                          <button
+                            onClick={() => !isFull && setRegModal(ev)}
+                            disabled={isFull}
+                            className={`mt-auto w-full py-2.5 rounded-2xl text-sm font-bold transition-all ${isFull
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : ev.isFree
+                                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
+                                : "bg-linear-to-r from-blue-600 to-indigo-500 text-white hover:opacity-90 shadow-sm"
+                              }`}
+                          >
+                            {isFull ? "Fully Booked" : ev.isFree ? "Register for Free" : `Pay ₹${ev.price} & Register`}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {/* View All link */}
+              <div className="text-center mt-10">
+                <Link
+                  to="/professional/events"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 font-bold rounded-2xl transition-all text-sm"
+                >
+                  View All Events
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </section>
+          );
+        })()}
+
+        {/* Section 3: The "Why" */}
         <section className="bg-white py-20 border-y border-dashed border-gray-200">
           <div className="container mx-auto px-4 text-center">
             <div className="inline-block px-4 py-1 bg-blue-100 text-blue-700 font-bold rounded-full mb-4 text-sm uppercase tracking-wide">
@@ -345,7 +662,7 @@ const ProfessionalHome = () => {
                       {course.nextDemoSession && (
                         <li className="text-blue-600 font-semibold">
                           Next Demo: {new Date(course.nextDemoSession.date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                          {" "}&middot; {(() => { const [h,m] = course.nextDemoSession.time.split(":").map(Number); const s = h >= 12 ? "PM" : "AM"; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2,"0")} ${s}`; })()}
+                          {" "}&middot; {(() => { const [h, m] = course.nextDemoSession.time.split(":").map(Number); const s = h >= 12 ? "PM" : "AM"; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2, "0")} ${s}`; })()}
                         </li>
                       )}
                     </ul>
@@ -362,11 +679,10 @@ const ProfessionalHome = () => {
                       <>
                         <button
                           onClick={() => handleCourseBookDemo(course)}
-                          className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                            course.nextDemoSession
-                              ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
-                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                          }`}
+                          className={`mt-2 inline-flex justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all ${course.nextDemoSession
+                            ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
+                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            }`}
                         >
                           {course.nextDemoSession ? "Book a Demo" : "No Demo Scheduled"}
                         </button>
@@ -614,6 +930,9 @@ const ProfessionalHome = () => {
           onClose={() => setCourseDemo(null)}
         />
       )}
+
+      {/* Event Registration Modal */}
+      {regModal && <EventRegModal event={regModal} onClose={() => setRegModal(null)} user={user} />}
     </div>
   );
 };

@@ -12,6 +12,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import JuniorClasses from "./pages/JuniorClasses";
 import JuniorTrophies from "./pages/JuniorTrophies";
+import JuniorEvents from "./pages/JuniorEvents";
+import ProfessionalEvents from "./pages/ProfessionalEvents";
 import CoursePlayer from "./pages/CoursePlayer";
 import Checkout from "./pages/Checkout";
 import OurCourses from "./pages/OurCourses";
@@ -40,6 +42,8 @@ function App() {
         <Route path="/book-demo" element={<BookDemo />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/junior/events"        element={<JuniorEvents />} />
+        <Route path="/professional/events"  element={<ProfessionalEvents />} />
         <Route path="/junior/classes" element={<JuniorClasses />} />
         <Route path="/junior/trophies" element={<JuniorTrophies />} />
         <Route path="/course/play/:id" element={<CoursePlayer />} />

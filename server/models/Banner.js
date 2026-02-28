@@ -25,6 +25,8 @@ const bannerSchema = new mongoose.Schema(
     universityId:       { type: String, default: "" },
     universityName:     { type: String, default: "" },
     targetDepartments:  [{ type: String }],    // e.g. ["Computer Science", "Electrical"]
+    // Linked event (if this banner promotes an Event)
+    eventId:    { type: String, default: "" },
     // Booking access control
     allowPublicBooking: { type: Boolean, default: true }, // false = only banner click can book
   },

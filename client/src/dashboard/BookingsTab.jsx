@@ -163,9 +163,17 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
   const [activeBooking,  setActiveBooking]  = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [bookingPage,    setBookingPage]    = useState(0);
+  const [selectedTab, setSelectedTab] = useState("bookings");
   const BOOKING_PAGE_SIZE = 10;
 
-  const shown   = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+  // Split bookings for tabs
+  const bookingsTabBookings = bookings.filter(
+    (b) => b.status === 'pending' || b.status === 'confirmed'
+  );
+  const historyTabBookings = bookings.filter(
+    (b) => b.status === 'completed' || b.status === 'cancelled'
+  );
+  const shown = selectedTab === 'bookings' ? (filter === "all" ? bookingsTabBookings : bookingsTabBookings.filter((b) => b.status === filter)) : (filter === "all" ? historyTabBookings : historyTabBookings.filter((b) => b.status === filter));
   const pagedBookings = shown.slice(bookingPage * BOOKING_PAGE_SIZE, (bookingPage + 1) * BOOKING_PAGE_SIZE);
   const bookingTotalPages = Math.ceil(shown.length / BOOKING_PAGE_SIZE);
   const isAdmin = user?.role === "admin";
@@ -564,7 +572,22 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
         </div>
       )}
 
+      {/* Tab Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div className="flex gap-2">
+          <button
+            className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${selectedTab === 'bookings' ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-orange-100'}`}
+            onClick={() => { setSelectedTab('bookings'); setBookingPage(0); }}
+          >
+            Bookings
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${selectedTab === 'history' ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-orange-100'}`}
+            onClick={() => { setSelectedTab('history'); setBookingPage(0); }}
+          >
+            Scheduled History
+          </button>
+        </div>
         <h2 className="text-lg font-bold text-slate-800">
           {isAdmin ? "All Demo Bookings (Admin)" : "My Demo Bookings"}
         </h2>
@@ -600,14 +623,16 @@ const BookingsTab = ({ bookings, loading, onCancel, user, onStatusUpdate, demoSe
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-gray-400 text-sm">No bookings found.</p>
+              <p className="text-gray-400 text-sm">
+                {selectedTab === 'bookings' ? 'No current bookings found.' : 'No scheduled history found.'}
+              </p>
             </div>
           )}
 
           {!loading && shown.length > 0 && (
             <>
             <div className="space-y-3">
-              {pagedBookings.map((b) => (
+              {shown.slice(bookingPage * BOOKING_PAGE_SIZE, (bookingPage + 1) * BOOKING_PAGE_SIZE).map((b) => (
             <div key={b._id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                 {/* Icon */}

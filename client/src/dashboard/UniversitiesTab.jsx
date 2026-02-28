@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import API_BASE from "../config/api";
 import { authHeader } from "./constants";
 
@@ -418,6 +419,7 @@ const UniversityModal = ({ token, editUniv, onClose, onSaved }) => {
 
 // ── Main Tab ───────────────────────────────────────────────────────────────────
 const UniversitiesTab = ({ token }) => {
+  const navigate       = useNavigate();
   const [universities, setUniversities] = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [modal,        setModal]        = useState(null); // null | "add" | { editUniv }
@@ -528,6 +530,17 @@ const UniversitiesTab = ({ token }) => {
                   <span className="text-xs text-gray-400 font-medium">
                     {univ.departments.length} dept{univ.departments.length !== 1 ? "s" : ""}
                   </span>
+                  {/* Events button */}
+                  <button
+                    onClick={() => navigate("/dashboard/events", { state: { filterUnivId: univ._id, filterUnivName: univ.name } })}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                    title="View events for this university"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Events
+                  </button>
                   {/* Edit university */}
                   <button
                     onClick={() => setModal({ editUniv: univ })}

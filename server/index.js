@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
 // Routes
@@ -22,6 +22,7 @@ const demoSessionRoutes = require("./routes/demoSessionRoutes");
 const paymentRoutes      = require("./routes/paymentRoutes");
 const universityRoutes   = require("./routes/universityRoutes");
 const bannerRoutes       = require("./routes/bannerRoutes");
+const eventRoutes        = require("./routes/eventRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/classes", classRoutes);
@@ -31,6 +32,7 @@ app.use("/api/demo-sessions", demoSessionRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/universities", universityRoutes);
 app.use("/api/banners",      bannerRoutes);
+app.use("/api/events",       eventRoutes);
 
 // Database Connection
 mongoose

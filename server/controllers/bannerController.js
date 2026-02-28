@@ -4,9 +4,30 @@ const Banner = require("../models/Banner");
 exports.getBanners = async (req, res) => {
   try {
     const { page } = req.query; // "junior" | "professional"
-    let filter = { isActive: true };
-    if (page === "junior")       filter.showOn = { $in: ["junior", "both"] };
-    if (page === "professional") filter.showOn = { $in: ["professional", "both"] };
+    // isActive: treat missing/null as active (backwards-compat with old docs)
+    const activeFilter = { $or: [{ isActive: true }, { isActive: { $exists: false } }, { isActive: null }] };
+
+    let showOnFilter = {};
+    if (page === "junior") {
+      showOnFilter = { $or: [
+        { showOn: { $in: ["junior", "both"] } },
+        { showOn: { $exists: false } },
+        { showOn: null },
+        { showOn: "" },
+      ]};
+    } else if (page === "professional") {
+      showOnFilter = { $or: [
+        { showOn: { $in: ["professional", "both"] } },
+        { showOn: { $exists: false } },
+        { showOn: null },
+        { showOn: "" },
+      ]};
+    }
+
+    const filter = page
+      ? { $and: [activeFilter, showOnFilter] }
+      : activeFilter;
+
     const banners = await Banner.find(filter).sort({ order: 1, createdAt: -1 });
     res.json(banners);
   } catch {
@@ -31,7 +52,7 @@ exports.createBanner = async (req, res) => {
     classId, className, classSlug, department, category,
     eventDate, eventTime,
     universityId, universityName, targetDepartments,
-    allowPublicBooking,
+    allowPublicBooking, eventId,
   } = req.body;
   if (!title || !imageUrl) return res.status(400).json({ message: "Title and image URL are required" });
   try {
@@ -44,6 +65,7 @@ exports.createBanner = async (req, res) => {
       universityId: universityId || "", universityName: universityName || "",
       targetDepartments: Array.isArray(targetDepartments) ? targetDepartments : [],
       allowPublicBooking: allowPublicBooking !== false,
+      eventId: eventId || "",
     });
     res.status(201).json(banner);
   } catch (err) {

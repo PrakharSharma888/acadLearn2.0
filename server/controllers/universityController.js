@@ -11,6 +11,17 @@ exports.getUniversityBySlug = async (req, res) => {
   }
 };
 
+// GET /api/universities/:id — fetch single university by id (public)
+exports.getUniversityById = async (req, res) => {
+  try {
+    const university = await University.findById(req.params.id);
+    if (!university) return res.status(404).json({ message: "University not found" });
+    res.json(university);
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // GET /api/universities — list all active universities (public)
 exports.getUniversities = async (req, res) => {
   try {
